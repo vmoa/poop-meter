@@ -4,7 +4,7 @@
 // Initial revision: 2018-03-01
 //
 // Required libraries:
-// Grove RGB LCD: ???
+// Grove RGB LCD: http://wiki.seeedstudio.com/Grove-LCD_RGB_Backlight/
 // Bounce: https://playground.arduino.cc/Code/Bounce
 // SoftReset: https://github.com/WickedDevice/SoftReset
 
@@ -15,7 +15,7 @@
 #include <Bounce2.h>
 #include <SoftReset.h>
 
-String Version = "v0.3";
+String Version = "v0.4";
 
 
 // Uncomment to slow things down and make it easier to debug
@@ -25,31 +25,31 @@ String Version = "v0.3";
  *  Input/Output Pins
  */
 
-#define heartLed	13  // onboard LED
-#define poopPin   	1   // 0-5v analog
-#define button1pin	4   // Menu button
-#define button2pin	5   // Up button
-#define button3pin	6   // Down button
+#define heartLed	13		// onboard LED
+#define poopPin   	1		// 0-5v analog
+#define button1pin	4		// Menu button
+#define button2pin	5		// Up button
+#define button3pin	6		// Down button
 
-#define EEPROM_MAGIC 0xCACA		// EEPROM bytes 0,1 to decect that we have valid data
+#define EEPROM_MAGIC	0xCACA		// EEPROM bytes 0,1 to decect that we have valid data
 #define EEPROM_UPDATE_DELAY 30000	// ms to wait after a value changes before writing eeprom (prevent excessive writes)
 
-#define DIM		0   // Display is currently dimmed
-#define BRIGHT		1   // Display is currently bright
-#define initTimeout	2000   // ms to display init screen
-#define dimDelay	10000  // ms after button press to keep the display bright, then reset state machine
-#define flashDelay	500    // ms between flashes
-#define flashThreshold  96     // % full that will trigger flashing display
-#define dimFactor	0.2    // how much to dim display
-#define DEBOUNCE_MS	5	// how long our buttons can bounce
-//#define REBOOT_MS	2^32-3600000  // force a reboot 1h before our counter wraps
-#define REBOOT_MS	3600000	// 1h for testing
+#define DIM		0		// Display is currently dimmed
+#define BRIGHT		1		// Display is currently bright
+#define initTimeout	2000		// ms to display init screen
+#define dimDelay	10000		// ms after button press to keep the display bright, then reset state machine
+#define flashDelay	500		// ms between flashes
+#define flashThreshold  96		// % full that will trigger flashing display
+#define dimFactor	0.2		// how much to dim display
+#define DEBOUNCE_MS	5		// how long our buttons can bounce
+//#define REBOOT_MS	2^32-3600000	// force a reboot 1h before our counter wraps
+#define REBOOT_MS	3600000		// 1h for testing
 
-#define POOP_HYSTERESIS 5	// Amount poopLevel may vary without reporting
-#define POOP_EMPTY 200		// Raw value for empty tank
-#define POOP_FULL 1024		// Raw value for full tank
+#define POOP_HYSTERESIS	5		// Amount poopLevel may vary without reporting
+#define POOP_EMPTY	200		// Raw value for empty tank
+#define POOP_FULL	1024		// Raw value for full tank
 
-#define BUTTON_NONE	0  // no button pressed
+#define BUTTON_NONE	0		// no button pressed
 #define BUTTON_MENU	2
 #define BUTTON_UP	3
 #define BUTTON_DN	4
@@ -59,7 +59,7 @@ String Version = "v0.3";
  *  Globals
  */
 
-struct EEpromDataType {				// Data stored in EEPROM
+struct EEpromDataType {			// Data stored in EEPROM
 	int magic;			// Value to ensure we have valid data
 	int poopLowMark;		// Corresponding globals
 	int poopHighMark;
@@ -77,17 +77,17 @@ Bounce menuButton = Bounce();
 Bounce upButton = Bounce();
 Bounce dnButton = Bounce();
 
-int heartBeatInterval = 500;   // ms between heart beat flashes
-int poopInterval = 30000;      // ms between poop updates w/o change
-int doPrint;  // Flag to force maybePrint() to really print
-unsigned long RebootMS = REBOOT_MS;  // in a global so we can extend if we're in a menu
-unsigned long BootDelay = 5000;    // time to display boot message
-unsigned long buttonTimeout = 0;   // time when button press times out (dimDelay)
-int ButtonPressed = BUTTON_NONE;	   // which button was pressed
+int heartBeatInterval = 500;		// ms between heart beat flashes
+int poopInterval = 30000;		// ms between poop updates w/o change
+int printInterval = 500;		// millis between maybePrint()s
+int doPrint;				// Flag to force maybePrint() to really print
+unsigned long RebootMS = REBOOT_MS;	// in a global so we can extend if we're in a menu
+unsigned long BootDelay = 5000;		// time to display boot message
+unsigned long buttonTimeout = 0;	// time when button press times out (dimDelay)
+int ButtonPressed = BUTTON_NONE;	// which button was pressed
 
-
-int Brightness;  // Current display brightness (either DIM or BRIGHT)
-int flashDisplay = 0;  // flag indicating whether or not we're flashing the display
+int Brightness;				// Current display brightness (either DIM or BRIGHT)
+int flashDisplay = 0;			// flag indicating whether or not we're flashing the display
 
 
 // Finite State Machine to handle menus ------------------------------
@@ -133,17 +133,17 @@ void (*state_table[])() = {s00_initialize, s01_normal, s02_normal2, s03_minPoop,
 
 // Colors from https://www.w3schools.com/colors/colors_picker.asp
 static int Color[4][4] = {
-  { 0, 0, 255 },     // C_DEFAULT: blue (used for boot)
-  { 0, 255, 0 },     // C_OK: green
-  { 255, 255, 0 },   // C_WARNING: yellow
-  { 255, 0, 0 },     // C_PANIC: red
+	{ 0, 0, 255 },		// C_DEFAULT: blue (used for boot)
+	{ 0, 255, 0 },		// C_OK: green
+	{ 255, 255, 0 },	// C_WARNING: yellow
+	{ 255, 0, 0 },		// C_PANIC: red
 };
 
 static String ColorName[4] = {
-  "Blue",
-  "Green",
-  "Yellow",
-  "Red",
+	"Blue",
+	"Green",
+	"Yellow",
+	"Red",
 };
 
 // Current color values -- global so we can dim
@@ -159,101 +159,91 @@ rgb_lcd lcd;
 
 #define poopLevels 3
 static int threshold[poopLevels][2] = {
-  { 75, C_PANIC },    // C_PANIC: red
-  { 50, C_WARNING },  // C_WARNING: orange
-  {  0, C_OK },       // C_OK: green
+	{ 75, C_PANIC },	// C_PANIC: red
+	{ 50, C_WARNING },	// C_WARNING: orange
+	{  0, C_OK },		// C_OK: green
 };
 int poopEmpty = POOP_EMPTY;	// Reading when empty
 int poopFull = POOP_FULL;	// Reading when full
-int poopLowMark = 9999;	// Lowest reading we've seen
-int poopHighMark = -1;	// Highest reading we've seen
-int poopLevel;		// Current poop level reading
-int poopPercent;	// Current percent full between poopEmpty and poopFull
-int flashMin = flashThreshold;  // % full when we start flashing
+int poopLowMark = 9999;		// Lowest reading we've seen
+int poopHighMark = -1;		// Highest reading we've seen
+int poopLevel;			// Current poop level reading
+int poopPercent;		// Current percent full between poopEmpty and poopFull
+int flashMin = flashThreshold;	// % full when we start flashing
 
 
 void setup()
 {
-  Serial.begin(115200);
-  Serial.println("RFO Poop Meter " + Version);
-  Serial.println("Preparing poopies!");
-  Serial.println("Will update status every " + String(poopInterval / 1000, DEC) + " seconds");
-  Serial.println("Will reboot every " + String(REBOOT_MS / 3600000, DEC) + " hours");
+	Serial.begin(115200);
+	Serial.println("RFO Poop Meter " + Version);
+	Serial.println("Preparing poopies!");
+	Serial.println("Will update status every " + String(poopInterval / 1000, DEC) + " seconds");
+	Serial.println("Will reboot every " + String(REBOOT_MS / 3600000, DEC) + " hours");
 #ifdef DEBUG
-  Serial.println("DEBUG mode enabled; recompile to turn off");
+	Serial.println("DEBUG mode enabled; recompile to turn off");
 #endif
 
-  lcd.begin(16, 2);
-  R = Color[C_DEFAULT][0];
-  G = Color[C_DEFAULT][1];
-  B = Color[C_DEFAULT][2];
-  lcd.setRGB(R,G,B);
-  lcd.write("RFO Poop Meter");
-  lcd.setCursor(0, 1);
-  String msg1 = "Let's Poop! " + Version;
-  lcd.write(msg1.c_str());
+	lcd.begin(16, 2);
+	R = Color[C_DEFAULT][0];
+	G = Color[C_DEFAULT][1];
+	B = Color[C_DEFAULT][2];
+	lcd.setRGB(R,G,B);
+	lcd.write("RFO Poop Meter");
+	lcd.setCursor(0, 1);
+	String msg1 = "Let's Poop! " + Version;
+	lcd.write(msg1.c_str());
 
-  Serial.println("Reading " + String(sizeof(EEpromData),DEC) + " bytes from EEPROM");
-  EEPROM.get(0, EEpromData);
-  printEeprom("<< ");
-/*  Serial.println("<< " + String(EEpromData.magic,DEC).c_str() + " " +
-	String(EEpromData.poopLowMark,DEC).c_str() + " " +
-	String(EEpromData.poopHighMark,DEC).c_str() + " " +
-	String(EEpromData.poopEmpty,DEC).c_str() + " " +
-	String(EEpromData.poopFull,DEC).c_str() + " " +
-	String(EEpromData.greenMin,DEC).c_str() + " " +
-	String(EEpromData.yellowMin,DEC).c_str() + " " +
-	String(EEpromData.redMin,DEC).c_str() + " " +
-	String(EEpromData.flashMin,DEC).c_str()); */
-  if (EEpromData.magic == EEPROM_MAGIC) {
-  	Serial.println("EEPROM valid; populating data from EEPROM");
-  	poopLowMark = EEpromData.poopLowMark;
-	poopHighMark = EEpromData.poopHighMark;
-  	poopEmpty = EEpromData.poopEmpty;
-	poopFull = EEpromData.poopFull;
-	threshold[2][0] = EEpromData.greenMin;
-	threshold[1][0] = EEpromData.yellowMin;
-	threshold[0][0] = EEpromData.redMin;
-	flashMin = EEpromData.flashMin;
-  } else {
-  	Serial.println("EEPROM not set; populating data with defaults");
-    	EEpromData.poopLowMark = poopLowMark;
-	EEpromData.poopHighMark = poopHighMark;
-  	EEpromData.poopEmpty = poopEmpty;
-	EEpromData.poopFull = poopFull;
-	EEpromData.greenMin = threshold[2][0];
-	EEpromData.yellowMin = threshold[1][0];
-	EEpromData.redMin = threshold[0][0];
-	EEpromData.flashMin = flashMin;
-  }
+	Serial.println("Reading " + String(sizeof(EEpromData),DEC) + " bytes from EEPROM");
+	EEPROM.get(0, EEpromData);
+	printEeprom("<< ");
+	if (EEpromData.magic == EEPROM_MAGIC) {
+		Serial.println("EEPROM valid; populating data from EEPROM");
+		poopLowMark = EEpromData.poopLowMark;
+		poopHighMark = EEpromData.poopHighMark;
+		poopEmpty = EEpromData.poopEmpty;
+		poopFull = EEpromData.poopFull;
+		threshold[2][0] = EEpromData.greenMin;
+		threshold[1][0] = EEpromData.yellowMin;
+		threshold[0][0] = EEpromData.redMin;
+		flashMin = EEpromData.flashMin;
+	} else {
+		Serial.println("EEPROM not set; populating data with defaults");
+		EEpromData.poopLowMark = poopLowMark;
+		EEpromData.poopHighMark = poopHighMark;
+		EEpromData.poopEmpty = poopEmpty;
+		EEpromData.poopFull = poopFull;
+		EEpromData.greenMin = threshold[2][0];
+		EEpromData.yellowMin = threshold[1][0];
+		EEpromData.redMin = threshold[0][0];
+		EEpromData.flashMin = flashMin;
+	}
 
-  pinMode(button1pin, INPUT);
-  menuButton.attach(button1pin);
-  menuButton.interval(DEBOUNCE_MS);
+	pinMode(button1pin, INPUT);
+	menuButton.attach(button1pin);
+	menuButton.interval(DEBOUNCE_MS);
 
-  pinMode(button2pin, INPUT);
-  upButton.attach(button2pin);
-  upButton.interval(DEBOUNCE_MS);
+	pinMode(button2pin, INPUT);
+	upButton.attach(button2pin);
+	upButton.interval(DEBOUNCE_MS);
 
-  pinMode(button3pin, INPUT);
-  dnButton.attach(button3pin);
-  dnButton.interval(DEBOUNCE_MS);
-  
-  pinMode(heartLed, OUTPUT);
-  digitalWrite(heartLed, LOW);
+	pinMode(button3pin, INPUT);
+	dnButton.attach(button3pin);
+	dnButton.interval(DEBOUNCE_MS);
+
+	pinMode(heartLed, OUTPUT);
+	digitalWrite(heartLed, LOW);
 }
-
 
 
 // Flash the onboard LED so we know we're alive
 void flashHeartBeat() {
-  static int heartBeat = 0;	// toggle to flash onboard LED
-  static unsigned long nextBeat = 0;
-  if (millis() >= nextBeat) {
-    heartBeat = !heartBeat;
-    digitalWrite(heartLed, heartBeat ? HIGH : LOW);
-    nextBeat = millis() + heartBeatInterval;
-  }
+	static int heartBeat = 0;	// toggle to flash onboard LED
+	static unsigned long nextBeat = 0;
+	if (millis() >= nextBeat) {
+		heartBeat = !heartBeat;
+		digitalWrite(heartLed, heartBeat ? HIGH : LOW);
+		nextBeat = millis() + heartBeatInterval;
+	}
 }
 
 
@@ -305,153 +295,130 @@ void scheduleEepromUpdate() {
 
 // Status printing functions -----------------------------------------------------------
 
-// Print a message with timestamp -- regardless of throttling
-// This is not currently in use: the algorithm is buggy and probably not worth the cycles anyway
-// Let's let Python do that!
-void dontPrint(String msg) {
-  // format a timestamp
-  unsigned long now = millis();
-  int dec = int(now % 1000 / 100);  // pull off decimal seconds
-  now = int(now / 1000);            // and convert to seconds
-  int hh = int(now / 3600);
-  int mm = int(int(now) % 3600 / 60);
-  String mmz = mm < 10 ? "0" : "";
-  int ss = int(now) % 60;
-  String ssz = ss < 10 ? "0" : "";
-  String timeStamp = String(hh, DEC) + ":" + mmz + String(mm, DEC) + ":" + ssz + String(ss, DEC) + "." + String(dec, DEC);
-  // and print
-  Serial.println(timeStamp + " " + msg);
-}
-
-
-
-static int printInterval = 500;  // millis between maybePrint()s
 // Print a message but throttle so we don't overrun serial port
 void maybePrint(String msg) {
-  static unsigned long nextPrint = 0;
-  if (millis() > nextPrint || doPrint == 1) {
-    Serial.println("[" + String(millis(),DEC) + "] " + msg);
-    doPrint = 0;
-    nextPrint = millis() + printInterval;
-  }
+	static unsigned long nextPrint = 0;
+	if (millis() > nextPrint || doPrint == 1) {
+		Serial.println("[" + String(millis(),DEC) + "] " + msg);
+		doPrint = 0;
+		nextPrint = millis() + printInterval;
+	}
 }
-
 
 // Check poop level and do stuff based on it
 void checkPoopLevel() {
-  static unsigned long nextPoop = 0;
-  static int lastColor = -1;
-  static int lastPoopLevel = -1;
+	static unsigned long nextPoop = 0;
+	static int lastColor = -1;
+	static int lastPoopLevel = -1;
 
-  // Read and normalize poop level
-  poopLevel = analogRead(poopPin);
-  if (poopLevel < poopLowMark) {
-  	poopLowMark = poopLevel;
-  }
-  if (poopLevel > poopHighMark) {
-  	poopHighMark = poopLevel;
-  }
+	// Read and normalize poop level
+	poopLevel = analogRead(poopPin);
+	if (poopLevel < poopLowMark) {
+		poopLowMark = poopLevel;
+	}
+	if (poopLevel > poopHighMark) {
+		poopHighMark = poopLevel;
+	}
 
-  // Calculate normalized percent full
-  poopPercent = int((float)(poopLevel - poopEmpty) / (poopFull - poopEmpty) * 100);
-  if (abs(lastPoopLevel - poopLevel) > POOP_HYSTERESIS) {   // prevent flapping
-    lastPoopLevel = poopLevel;
-    nextPoop = millis();  // report now
-  }
+	// Calculate normalized percent full
+	poopPercent = int((float)(poopLevel - poopEmpty) / (poopFull - poopEmpty) * 100);
+	if (abs(lastPoopLevel - poopLevel) > POOP_HYSTERESIS) {   // prevent flapping
+		lastPoopLevel = poopLevel;
+		nextPoop = millis();  // report now
+	}
 
-  // Flash display if warranted
-  if (poopPercent > flashMin) {
-    flashDisplay = 1;
-  } else {
-    flashDisplay = 0;
-  }
+	// Flash display if warranted
+	if (poopPercent > flashMin) {
+		flashDisplay = 1;
+	} else {
+		flashDisplay = 0;
+	}
 
-  int color;
-  for (int i = 0; i < poopLevels; i++) {
-    if (poopPercent >= threshold[i][0]) {
-      color = threshold[i][1];
-      break;
-    }
-  }
+	int color;
+	for (int i = 0; i < poopLevels; i++) {
+		if (poopPercent >= threshold[i][0]) {
+			color = threshold[i][1];
+			break;
+		}
+	}
 
-  if (millis() > BootDelay && color != lastColor) {
-    BootDelay = 0;  // only during boot, right?
-    R = Color[color][0];
-    G = Color[color][1];
-    B = Color[color][2];
-    lcd.setRGB(R, G, B);
-    lastColor = color;
-    nextPoop = millis();  // report now
-  }
+	if (millis() > BootDelay && color != lastColor) {
+		BootDelay = 0;  // only during boot, right?
+		R = Color[color][0];
+		G = Color[color][1];
+		B = Color[color][2];
+		lcd.setRGB(R, G, B);
+		lastColor = color;
+		nextPoop = millis();  // report now
+	}
 
-  if (millis() >= nextPoop || doPrint == 1) {
-    maybePrint("Poop Code " + ColorName[color] + ": " + String(poopPercent, DEC) + "% (abs:" + String(poopLevel, DEC) + ") Brightness:" 
-               + String(Brightness,DEC) + " ButtonPressed:" + String(ButtonPressed,DEC));
-    nextPoop = millis() + poopInterval;
-  }
+	if (millis() >= nextPoop || doPrint == 1) {
+		maybePrint("Poop Code " + ColorName[color] + ": " + String(poopPercent, DEC) + "% (abs:" + String(poopLevel, DEC) + ") Brightness:" 
+		       + String(Brightness,DEC) + " ButtonPressed:" + String(ButtonPressed,DEC));
+		nextPoop = millis() + poopInterval;
+	}
 }
 
-int Menu = 0;
 
 void checkButtons() {
-  menuButton.update();  // Required by Bounce
-  upButton.update();
-  dnButton.update();
-  if (menuButton.rose()) {
-     buttonTimeout = millis() + dimDelay;
-     ButtonPressed = BUTTON_MENU;
-  } else if (upButton.rose()) {
-     buttonTimeout = millis() + dimDelay;
-     ButtonPressed = BUTTON_UP;
-  } else if (dnButton.rose()) {
-     buttonTimeout = millis() + dimDelay;
-     ButtonPressed = BUTTON_DN;
-  }
+	menuButton.update();  // Required by Bounce
+	upButton.update();
+	dnButton.update();
+	if (menuButton.rose()) {
+		buttonTimeout = millis() + dimDelay;
+		ButtonPressed = BUTTON_MENU;
+	} else if (upButton.rose()) {
+		buttonTimeout = millis() + dimDelay;
+		ButtonPressed = BUTTON_UP;
+	} else if (dnButton.rose()) {
+		buttonTimeout = millis() + dimDelay;
+		ButtonPressed = BUTTON_DN;
+	}
 }
 
 
 // Dim display unless a condition exists to keep it bright
 void dimDisplay() {
-  static unsigned long nextFlash = 0;	
+	static unsigned long nextFlash = 0;	
 
-  // Button has been pressed
-  if (millis() < buttonTimeout || millis() < BootDelay) {
-    Brightness = BRIGHT;    
+	// Button has been pressed
+	if (millis() < buttonTimeout || millis() < BootDelay) {
+		Brightness = BRIGHT;    
 
-  // If we're flashing...
-  } else if (flashDisplay) {
-    // ...toggle brightness each flashDelay
-    if (millis() > nextFlash) {
-    	Brightness = (Brightness == DIM) ? BRIGHT : DIM;
-    	nextFlash = millis() + flashDelay;
-    }
+	// If we're flashing...
+	} else if (flashDisplay) {
+		// ...toggle brightness each flashDelay
+		if (millis() > nextFlash) {
+			Brightness = (Brightness == DIM) ? BRIGHT : DIM;
+			nextFlash = millis() + flashDelay;
+		}
 
-  // Default is to dim display
-  } else {
-    Brightness = DIM;
-    curr_state = (millis() < RebootMS) ? S01_normal : S99_reboot;   // And revert to normal or reboot
-  }
+	// Default is to dim display
+	} else {
+		Brightness = DIM;
+		curr_state = (millis() < RebootMS) ? S01_normal : S99_reboot;   // And revert to normal or reboot
+	}
 
-  float factor = (Brightness==DIM) ? dimFactor : 1;
-  int myR = R * factor;
-  int myG = G * factor;
-  int myB = B * factor;
-  lcd.setRGB(int(R*factor), int(G*factor), int(B*factor));
+	float factor = (Brightness==DIM) ? dimFactor : 1;
+	int myR = R * factor;
+	int myG = G * factor;
+	int myB = B * factor;
+	lcd.setRGB(int(R*factor), int(G*factor), int(B*factor));
 }
 
 void displayLCD(String msg0, String msg1) {
-  if (millis() > BootDelay) {
-    lcd.setCursor(0, 0);
-    lcd.write((char *)msg0.c_str());
-    lcd.setCursor(0, 1);
-    lcd.write((char *)msg1.c_str());
-  }
+	if (millis() > BootDelay) {
+		lcd.setCursor(0, 0);
+		lcd.write((char *)msg0.c_str());
+		lcd.setCursor(0, 1);
+		lcd.write((char *)msg1.c_str());
+	}
 }
-    
+
 
 /*
- 	State Machine ------------------------------------------------
-*/
+ * 	State Machine ------------------------------------------------
+ */
 
 
 #define MSG_BOGUS	"Bogus Menu Entry"
@@ -671,20 +638,20 @@ void s99_reboot() {
 
 
 /*
- 	Main processing ------------------------------------------------
-*/
+ * 	Main processing ------------------------------------------------
+ */
 
 void loop() {
-  delay(100);
-  flashHeartBeat();
-  checkPoopLevel();
-  checkButtons();
-  dimDisplay();
-  state_table[curr_state]();
-  maybeEepromUpdate();
+	delay(100);
+	flashHeartBeat();
+	checkPoopLevel();
+	checkButtons();
+	dimDisplay();
+	state_table[curr_state]();
+	maybeEepromUpdate();
 
 #ifdef DEBUG
-  delay(100);  // Slow things down for sanity sake
+	delay(100);  // Slow things down for sanity sake
 #endif
 }
 
