@@ -15,7 +15,7 @@
 #include <Bounce2.h>
 #include <SoftReset.h>
 
-String Version = "v0.4";
+String Version = "v1.0";
 
 
 // Uncomment to slow things down and make it easier to debug
@@ -32,7 +32,8 @@ String Version = "v0.4";
 #define button3pin	6		// Down button
 
 #define EEPROM_MAGIC	0xCACA		// EEPROM bytes 0,1 to decect that we have valid data
-#define EEPROM_UPDATE_DELAY 30000	// ms to wait after a value changes before writing eeprom (prevent excessive writes)
+#define EEPROM_CHECK_DELAY 3600000	// ms for regular check of eeprom updating (1h)
+#define EEPROM_UPDATE_DELAY 60000	// ms to wait after a menu change before writing eeprom (60s)
 
 #define DIM		0		// Display is currently dimmed
 #define BRIGHT		1		// Display is currently bright
@@ -42,8 +43,8 @@ String Version = "v0.4";
 #define flashThreshold  96		// % full that will trigger flashing display
 #define dimFactor	0.2		// how much to dim display
 #define DEBOUNCE_MS	5		// how long our buttons can bounce
-//#define REBOOT_MS	2^32-3600000	// force a reboot 1h before our counter wraps
-#define REBOOT_MS	3600000		// 1h for testing
+#define REBOOT_MS	86400000	// force a daily reboot
+//#define REBOOT_MS	3600000		// 1h for testing
 
 #define POOP_HYSTERESIS	5		// Amount poopLevel may vary without reporting
 #define POOP_EMPTY	200		// Raw value for empty tank
@@ -70,7 +71,7 @@ struct EEpromDataType {			// Data stored in EEPROM
 	int redMin;			// threshold[0][0]
 	int flashMin;			// Global
 } EEpromData;
-unsigned long UpdateEepromTime = 0;	// when to write the EEPROM data
+unsigned long UpdateEepromTime = EEPROM_UPDATE_DELAY;	// when to write the EEPROM data
 void printEeprom(String prefix);	// forward declaration so we can use it in setup()
 
 Bounce menuButton = Bounce();
@@ -80,7 +81,6 @@ Bounce dnButton = Bounce();
 int heartBeatInterval = 500;		// ms between heart beat flashes
 int poopInterval = 30000;		// ms between poop updates w/o change
 int printInterval = 500;		// millis between maybePrint()s
-int doPrint;				// Flag to force maybePrint() to really print
 unsigned long RebootMS = REBOOT_MS;	// in a global so we can extend if we're in a menu
 unsigned long BootDelay = 5000;		// time to display boot message
 unsigned long buttonTimeout = 0;	// time when button press times out (dimDelay)
@@ -265,7 +265,8 @@ void printEeprom(String prefix) {
 
 // Update EEPROM immediately
 void doEepromUpdate() {
-	Serial.println("Writing " + String(sizeof(EEpromData),DEC) + " bytes to EEPROM");
+	String msg = "Writing " + String(sizeof(EEpromData),DEC) + " bytes to EEPROM";
+	doPrint(msg);
 	EEpromData.magic = EEPROM_MAGIC;
     	EEpromData.poopLowMark = poopLowMark;
 	EEpromData.poopHighMark = poopHighMark;
@@ -277,30 +278,48 @@ void doEepromUpdate() {
 	EEpromData.flashMin = flashMin;
 	printEeprom(">> ");
 	EEPROM.put(0, EEpromData);
-	UpdateEepromTime = 0;
 }
 
-// Update EEPROM if non-thrashing timer has expired
+// Update EEPROM if timer has expired and data has changed
 void maybeEepromUpdate() {
-	if (UpdateEepromTime > 0 && millis() > UpdateEepromTime) {
-		doEepromUpdate();
+	if (millis() > UpdateEepromTime) {
+		// Check if current data has changed from what's in eerpom
+		EEpromDataType tempEEpromData;
+		EEPROM.get(0, tempEEpromData);
+		if (tempEEpromData.poopLowMark	<= poopLowMark &&
+		    tempEEpromData.poopHighMark	>= poopHighMark &&
+		    tempEEpromData.poopEmpty	== poopEmpty &&
+		    tempEEpromData.poopFull	== poopFull &&
+		    tempEEpromData.greenMin	== threshold[2][0] &&
+		    tempEEpromData.yellowMin	== threshold[1][0] &&
+		    tempEEpromData.redMin	== threshold[0][0] &&
+		    tempEEpromData.flashMin	== flashMin)
+		{
+		  	doPrint("EEPROM check: no update needed");
+		} else {
+			// And if so then write
+			doEepromUpdate();
+		}
+		UpdateEepromTime = millis() + EEPROM_CHECK_DELAY;
 	}
 }
 
-// Set the EEPROM update timer to prevent thrashing
+// Schedule EEPROM update real soon, but long enough out to prevent thrashing
 void scheduleEepromUpdate() {
-	UpdateEepromTime = millis() + EEPROM_UPDATE_DELAY;  // prevent thrashing
+	UpdateEepromTime = millis() + EEPROM_UPDATE_DELAY;
 }
 
 
 // Status printing functions -----------------------------------------------------------
 
+void doPrint(String msg) {
+	Serial.println("[" + String(millis(),DEC) + "] " + msg);
+}
 // Print a message but throttle so we don't overrun serial port
 void maybePrint(String msg) {
 	static unsigned long nextPrint = 0;
-	if (millis() > nextPrint || doPrint == 1) {
-		Serial.println("[" + String(millis(),DEC) + "] " + msg);
-		doPrint = 0;
+	if (millis() > nextPrint) {
+		doPrint(msg);
 		nextPrint = millis() + printInterval;
 	}
 }
@@ -352,7 +371,7 @@ void checkPoopLevel() {
 		nextPoop = millis();  // report now
 	}
 
-	if (millis() >= nextPoop || doPrint == 1) {
+	if (millis() >= nextPoop) {
 		maybePrint("Poop Code " + ColorName[color] + ": " + String(poopPercent, DEC) + "% (abs:" + String(poopLevel, DEC) + ") Brightness:" 
 		       + String(Brightness,DEC) + " ButtonPressed:" + String(ButtonPressed,DEC));
 		nextPoop = millis() + poopInterval;
@@ -530,13 +549,13 @@ void doUpDown(String msg0, String msg1, int &var, int min, int max, State_type n
 	} else if (ButtonPressed == BUTTON_UP) {
 		if (var < max) {
 			var++;
-			last_state = -1;
+			last_state = (State_type) -1;
 			scheduleEepromUpdate();
 		}
 	} else if (ButtonPressed == BUTTON_DN) {
 		if (var > min) {
 			var--;
-			last_state = -1;
+			last_state = (State_type) -1;
 			scheduleEepromUpdate();
 		}
 	}
@@ -617,6 +636,8 @@ void s99_reboot() {
 	} else {
 		if (millis() > nextCountdown) {
 			if (countdown == 0) {
+				UpdateEepromTime = 0;
+				maybeEepromUpdate();
 				displayLCD(MSG_REBOOT0, MSG_BOOM);
 				Serial.println("Boom!");
 				soft_restart();
@@ -628,11 +649,6 @@ void s99_reboot() {
 				nextCountdown += 1000;
 			}
 		}
-	}
-
-	if (countdown <= 2 && UpdateEepromTime > 0) {
-		// If we're T-minus 2 and need to update, then hell be damned... just do it
-		doEepromUpdate();
 	}
 }
 
