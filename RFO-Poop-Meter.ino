@@ -15,7 +15,7 @@
 #include <Bounce2.h>
 #include <SoftReset.h>
 
-String Version = "v1.0";
+String Version = "v1.1";
 
 
 // Uncomment to slow things down and make it easier to debug
@@ -55,6 +55,8 @@ String Version = "v1.0";
 #define BUTTON_UP	3
 #define BUTTON_DN	4
 
+#define UNPLUG_DELAY	5000		// ms delay for skipping hi/low water marks if sensor unplugged
+
 
 /*
  *  Globals
@@ -85,6 +87,9 @@ unsigned long RebootMS = REBOOT_MS;	// in a global so we can extend if we're in 
 unsigned long BootDelay = 5000;		// time to display boot message
 unsigned long buttonTimeout = 0;	// time when button press times out (dimDelay)
 int ButtonPressed = BUTTON_NONE;	// which button was pressed
+unsigned long UnpluggedDelay = 0;	// Stop tracking hi/low water marks if sensor unplugged
+bool SensorUnplugged = 0;		// Used to track notification of restore
+
 
 int Brightness;				// Current display brightness (either DIM or BRIGHT)
 int flashDisplay = 0;			// flag indicating whether or not we're flashing the display
@@ -96,7 +101,7 @@ int flashDisplay = 0;			// flag indicating whether or not we're flashing the dis
 // ...the enum varialbes start with uppercase S
 // ...the function names start with lowcase s
 
-typedef enum {S00_initialize = 0, S01_normal, S02_normal2, S03_minPoop, S04_maxPoop, S05_emptyValue,
+typedef enum {S00_initialize = 0, S01_normal, S02_normal2, S02a_version, S03_minPoop, S04_maxPoop, S05_emptyValue,
 	S06_fullValue, S07_minGreenValue, S08_minYellowValue, S09_minRedValue, S10_minFlashValue, S11_resetDefaults,
 	S12_confirmReset, S13_doReset, S99_reboot} State_type;
 State_type curr_state;
@@ -106,6 +111,7 @@ State_type last_state;
 void s00_initialize();  // forward declarations
 void s01_normal();
 void s02_normal2();
+void s02a_version();
 void s03_minPoop();
 void s04_maxPoop();
 void s05_emptyValue();
@@ -118,7 +124,7 @@ void s11_resetDefaults();
 void s12_confirmReset();
 void s13_doReset();
 void s99_reboot();
-void (*state_table[])() = {s00_initialize, s01_normal, s02_normal2, s03_minPoop, s04_maxPoop, s05_emptyValue,
+void (*state_table[])() = {s00_initialize, s01_normal, s02_normal2, s02a_version, s03_minPoop, s04_maxPoop, s05_emptyValue,
 	s06_fullValue, s07_minGreenValue, s08_minYellowValue, s09_minRedValue, s10_minFlashValue, s11_resetDefaults,
 	s12_confirmReset, s13_doReset, s99_reboot};
 
@@ -330,13 +336,34 @@ void checkPoopLevel() {
 	static int lastColor = -1;
 	static int lastPoopLevel = -1;
 
-	// Read and normalize poop level
+	// Read poop level
 	poopLevel = analogRead(poopPin);
-	if (poopLevel < poopLowMark) {
-		poopLowMark = poopLevel;
+
+	// Detect unplugged sensor
+	if (poopLevel == 0) {
+		// Print log message when we first detect that sensor is unplugged
+		if (!SensorUnplugged) {
+			doPrint("Sensor appears to be unplugged");
+			SensorUnplugged = 1;  // Watch for restore
+		}
+		// Skip tracking hi/low for a few seconds after restore to let sensor stabilize
+		UnpluggedDelay = millis() + UNPLUG_DELAY;
 	}
-	if (poopLevel > poopHighMark) {
-		poopHighMark = poopLevel;
+
+	// Track high/low water marks
+	if (millis() >= UnpluggedDelay) {
+		if (poopLevel > 0 && poopLevel < poopLowMark) {
+			poopLowMark = poopLevel;
+		}
+		if (poopLevel > poopHighMark) {
+			poopHighMark = poopLevel;
+		}
+	}
+
+	// Watch for sensor restored
+	if (SensorUnplugged && poopLevel > 0) {
+		doPrint("Sensor restored");
+		SensorUnplugged = 0;
 	}
 
 	// Calculate normalized percent full
@@ -372,8 +399,13 @@ void checkPoopLevel() {
 	}
 
 	if (millis() >= nextPoop) {
-		maybePrint("Poop Code " + ColorName[color] + ": " + String(poopPercent, DEC) + "% (abs:" + String(poopLevel, DEC) + ") Brightness:" 
-		       + String(Brightness,DEC) + " ButtonPressed:" + String(ButtonPressed,DEC));
+		maybePrint("Poop Code " + ColorName[color] + ": " + String(poopPercent, DEC) + "% (abs:" + String(poopLevel, DEC) + ")" +
+			" Brt:" + String(Brightness,DEC) +
+			" But:" + String(ButtonPressed,DEC) +
+			" Low:" + String(poopLowMark,DEC) +
+			" Hi:"  + String(poopHighMark,DEC) +
+			" Reboot:" + String((float)(RebootMS-millis())/3600000,2) + "h"
+		);
 		nextPoop = millis() + poopInterval;
 	}
 }
@@ -500,11 +532,19 @@ void s01_normal() {
 void s02_normal2() {
 	s01_s02_display();
 	if (ButtonPressed == BUTTON_MENU) {
-		curr_state = S03_minPoop;
+		curr_state = S02a_version;
 		ButtonPressed = BUTTON_NONE;
 	}
 }
 
+void s02a_version() {
+	String msg0 = "Poop Meter " + Version + "  ";
+	displayLCD(msg0, MSG_MENU);
+	if (ButtonPressed == BUTTON_MENU) {
+		curr_state = S03_minPoop;
+		ButtonPressed = BUTTON_NONE;
+	}
+}
 
 void stringEmbed(String &msg, int value) {
 	String valStr = String(value,DEC);
