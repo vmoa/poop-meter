@@ -15,7 +15,7 @@
 #include <Bounce2.h>
 #include <SoftReset.h>
 
-String Version = "v1.1";
+String Version = "v1.2";
 
 
 // Uncomment to slow things down and make it easier to debug
@@ -47,8 +47,8 @@ String Version = "v1.1";
 //#define REBOOT_MS	3600000		// 1h for testing
 
 #define POOP_HYSTERESIS	5		// Amount poopLevel may vary without reporting
-#define POOP_EMPTY	200		// Raw value for empty tank
-#define POOP_FULL	1024		// Raw value for full tank
+#define POOP_EMPTY	420		// Raw value for empty tank (set after 7/2018 pump out)
+#define POOP_FULL	1010		// Raw value for full tank (calculated based on Greg's percentag 7/2018)
 
 #define BUTTON_NONE	0		// no button pressed
 #define BUTTON_MENU	2
@@ -72,17 +72,19 @@ struct EEpromDataType {			// Data stored in EEPROM
 	int yellowMin;			// threshold[1][0]
 	int redMin;			// threshold[0][0]
 	int flashMin;			// Global
+	long writeCount;
 } EEpromData;
 unsigned long UpdateEepromTime = EEPROM_UPDATE_DELAY;	// when to write the EEPROM data
 void printEeprom(String prefix);	// forward declaration so we can use it in setup()
+long writeCount = 0;			// number of times EEPROM has been written
 
 Bounce menuButton = Bounce();
 Bounce upButton = Bounce();
 Bounce dnButton = Bounce();
 
 int heartBeatInterval = 500;		// ms between heart beat flashes
-int poopInterval = 30000;		// ms between poop updates w/o change
-int printInterval = 500;		// millis between maybePrint()s
+int poopReportInterval = 30000;		// ms between poop updates w/o change
+int printInterval = 500;		// minimum millis between poopReport prints
 unsigned long RebootMS = REBOOT_MS;	// in a global so we can extend if we're in a menu
 unsigned long BootDelay = 5000;		// time to display boot message
 unsigned long buttonTimeout = 0;	// time when button press times out (dimDelay)
@@ -101,7 +103,7 @@ int flashDisplay = 0;			// flag indicating whether or not we're flashing the dis
 // ...the enum varialbes start with uppercase S
 // ...the function names start with lowcase s
 
-typedef enum {S00_initialize = 0, S01_normal, S02_normal2, S02a_version, S03_minPoop, S04_maxPoop, S05_emptyValue,
+typedef enum {S00_initialize = 0, S01_normal, S02_normal2, S02a_version, S02b_curPoop, S03_minPoop, S04_maxPoop, S05_emptyValue,
 	S06_fullValue, S07_minGreenValue, S08_minYellowValue, S09_minRedValue, S10_minFlashValue, S11_resetDefaults,
 	S12_confirmReset, S13_doReset, S99_reboot} State_type;
 State_type curr_state;
@@ -112,6 +114,7 @@ void s00_initialize();  // forward declarations
 void s01_normal();
 void s02_normal2();
 void s02a_version();
+void s02b_curPoop();
 void s03_minPoop();
 void s04_maxPoop();
 void s05_emptyValue();
@@ -124,7 +127,7 @@ void s11_resetDefaults();
 void s12_confirmReset();
 void s13_doReset();
 void s99_reboot();
-void (*state_table[])() = {s00_initialize, s01_normal, s02_normal2, s02a_version, s03_minPoop, s04_maxPoop, s05_emptyValue,
+void (*state_table[])() = {s00_initialize, s01_normal, s02_normal2, s02a_version, s02b_curPoop, s03_minPoop, s04_maxPoop, s05_emptyValue,
 	s06_fullValue, s07_minGreenValue, s08_minYellowValue, s09_minRedValue, s10_minFlashValue, s11_resetDefaults,
 	s12_confirmReset, s13_doReset, s99_reboot};
 
@@ -183,7 +186,7 @@ void setup()
 	Serial.begin(115200);
 	Serial.println("RFO Poop Meter " + Version);
 	Serial.println("Preparing poopies!");
-	Serial.println("Will update status every " + String(poopInterval / 1000, DEC) + " seconds");
+	Serial.println("Will update status every " + String(poopReportInterval / 1000, DEC) + " seconds");
 	Serial.println("Will reboot every " + String(REBOOT_MS / 3600000, DEC) + " hours");
 #ifdef DEBUG
 	Serial.println("DEBUG mode enabled; recompile to turn off");
@@ -212,6 +215,7 @@ void setup()
 		threshold[1][0] = EEpromData.yellowMin;
 		threshold[0][0] = EEpromData.redMin;
 		flashMin = EEpromData.flashMin;
+		writeCount = EEpromData.writeCount;
 	} else {
 		Serial.println("EEPROM not set; populating data with defaults");
 		EEpromData.poopLowMark = poopLowMark;
@@ -222,6 +226,8 @@ void setup()
 		EEpromData.yellowMin = threshold[1][0];
 		EEpromData.redMin = threshold[0][0];
 		EEpromData.flashMin = flashMin;
+		EEpromData.writeCount = writeCount;
+		UpdateEepromTime = millis() + 2000;  // flush to EEPROM after a few loops
 	}
 
 	pinMode(button1pin, INPUT);
@@ -257,21 +263,23 @@ void flashHeartBeat() {
 
 void printEeprom(String prefix) {
 	String msg = prefix +
-		String(EEpromData.magic,HEX).c_str() + " " +
-		String(EEpromData.poopLowMark,DEC).c_str() + " " +
-		String(EEpromData.poopHighMark,DEC).c_str() + " " +
-		String(EEpromData.poopEmpty,DEC).c_str() + " " +
-		String(EEpromData.poopFull,DEC).c_str() + " " +
-		String(EEpromData.greenMin,DEC).c_str() + " " +
-		String(EEpromData.yellowMin,DEC).c_str() + " " +
-		String(EEpromData.redMin,DEC).c_str() + " " +
-		String(EEpromData.flashMin,DEC).c_str();
+		String(EEpromData.magic,HEX).c_str() +
+		" L:" + String(EEpromData.poopLowMark,DEC).c_str() +
+		" H:" + String(EEpromData.poopHighMark,DEC).c_str() +
+		" E:" + String(EEpromData.poopEmpty,DEC).c_str() +
+		" F:" + String(EEpromData.poopFull,DEC).c_str() +
+		" G:" + String(EEpromData.greenMin,DEC).c_str() +
+		" Y:" + String(EEpromData.yellowMin,DEC).c_str() +
+		" R:" + String(EEpromData.redMin,DEC).c_str() +
+		" X:" + String(EEpromData.flashMin,DEC).c_str() +
+		" #:" + String(EEpromData.writeCount,DEC),c_str();
 	Serial.println(msg);
 }
 
 // Update EEPROM immediately
 void doEepromUpdate() {
-	String msg = "Writing " + String(sizeof(EEpromData),DEC) + " bytes to EEPROM";
+	writeCount++;
+	String msg = "Writing " + String(sizeof(EEpromData),DEC) + " bytes to EEPROM (" + String(writeCount,DEC) + " writes)";
 	doPrint(msg);
 	EEpromData.magic = EEPROM_MAGIC;
     	EEpromData.poopLowMark = poopLowMark;
@@ -282,6 +290,7 @@ void doEepromUpdate() {
 	EEpromData.yellowMin = threshold[1][0];
 	EEpromData.redMin = threshold[0][0];
 	EEpromData.flashMin = flashMin;
+	EEpromData.writeCount = writeCount;
 	printEeprom(">> ");
 	EEPROM.put(0, EEpromData);
 }
@@ -299,7 +308,8 @@ void maybeEepromUpdate() {
 		    tempEEpromData.greenMin	== threshold[2][0] &&
 		    tempEEpromData.yellowMin	== threshold[1][0] &&
 		    tempEEpromData.redMin	== threshold[0][0] &&
-		    tempEEpromData.flashMin	== flashMin)
+		    tempEEpromData.flashMin	== flashMin &&
+		    tempEEpromData.writeCount	== writeCount)
 		{
 		  	doPrint("EEPROM check: no update needed");
 		} else {
@@ -321,21 +331,14 @@ void scheduleEepromUpdate() {
 void doPrint(String msg) {
 	Serial.println("[" + String(millis(),DEC) + "] " + msg);
 }
-// Print a message but throttle so we don't overrun serial port
-void maybePrint(String msg) {
-	static unsigned long nextPrint = 0;
-	if (millis() > nextPrint) {
-		doPrint(msg);
-		nextPrint = millis() + printInterval;
-	}
-}
 
 // Check poop level and do stuff based on it
 void checkPoopLevel() {
-	static unsigned long nextPoop = 0;
+	static unsigned long nextPoopReport = 0;
+	static unsigned long nextPrint = 0;
 	static int lastColor = -1;
 	static int lastPoopLevel = -1;
-
+	
 	// Read poop level
 	poopLevel = analogRead(poopPin);
 
@@ -370,7 +373,7 @@ void checkPoopLevel() {
 	poopPercent = int((float)(poopLevel - poopEmpty) / (poopFull - poopEmpty) * 100);
 	if (abs(lastPoopLevel - poopLevel) > POOP_HYSTERESIS) {   // prevent flapping
 		lastPoopLevel = poopLevel;
-		nextPoop = millis();  // report now
+		nextPoopReport = millis();  // report now
 	}
 
 	// Flash display if warranted
@@ -395,18 +398,22 @@ void checkPoopLevel() {
 		B = Color[color][2];
 		lcd.setRGB(R, G, B);
 		lastColor = color;
-		nextPoop = millis();  // report now
+		nextPoopReport = millis();  // report now
 	}
 
-	if (millis() >= nextPoop) {
-		maybePrint("Poop Code " + ColorName[color] + ": " + String(poopPercent, DEC) + "% (abs:" + String(poopLevel, DEC) + ")" +
-			" Brt:" + String(Brightness,DEC) +
-			" But:" + String(ButtonPressed,DEC) +
-			" Low:" + String(poopLowMark,DEC) +
-			" Hi:"  + String(poopHighMark,DEC) +
-			" Reboot:" + String((float)(RebootMS-millis())/3600000,2) + "h"
-		);
-		nextPoop = millis() + poopInterval;
+	if (millis() >= nextPoopReport) {
+		if (millis() >= nextPrint) {
+			doPrint("Poop Code " + ColorName[color] + ": " + String(poopPercent, DEC) + "% (abs:" + String(poopLevel, DEC) + ")" +
+				" Brt:" + String(Brightness,DEC) +
+				" But:" + String(ButtonPressed,DEC) +
+				" Low:" + String(poopLowMark,DEC) +
+				" Hi:"  + String(poopHighMark,DEC) +
+				" EEwrites:" + String(writeCount,DEC) +
+				" Reboot:" + String((float)(RebootMS-millis())/3600000,2) + "h"
+			);
+			nextPrint = millis() + printInterval;  // prevent over-running serial port
+		}
+		nextPoopReport = millis() + poopReportInterval;
 	}
 }
 
@@ -480,6 +487,7 @@ void displayLCD(String msg0, String msg1) {
 #define MSG_CAN_RESET	"Cancel     Reset"
 
 #define MSG_POOP  	"Poop level...   "
+#define MSG_CUR_POOP  	"Cur poop        "
 #define MSG_MIN_POOP  	"Low poop        "
 #define MSG_MAX_POOP 	"High poop       "
 #define MSG_EMPTY  	"Empty value     "
@@ -541,7 +549,7 @@ void s02a_version() {
 	String msg0 = "Poop Meter " + Version + "  ";
 	displayLCD(msg0, MSG_MENU);
 	if (ButtonPressed == BUTTON_MENU) {
-		curr_state = S03_minPoop;
+		curr_state = S02b_curPoop;
 		ButtonPressed = BUTTON_NONE;
 	}
 }
@@ -550,6 +558,19 @@ void stringEmbed(String &msg, int value) {
 	String valStr = String(value,DEC);
 	msg.remove(msg.length() - valStr.length());
 	msg.concat(valStr);
+}
+
+void s02b_curPoop() {
+	if (last_state != curr_state) {
+		last_state = curr_state;
+		String msg0 = MSG_CUR_POOP;
+		stringEmbed(msg0, poopLevel);
+		displayLCD(msg0, MSG_NEXT);
+	}
+	if (ButtonPressed == BUTTON_MENU) {
+		curr_state = S03_minPoop;
+		ButtonPressed = BUTTON_NONE;
+	}
 }
 
 void s03_minPoop() {
