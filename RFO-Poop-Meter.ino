@@ -15,7 +15,7 @@
 #include <Bounce2.h>
 #include <SoftReset.h>
 
-String Version = "v1.2";
+String Version = "v1.4";
 
 
 // Uncomment to slow things down and make it easier to debug
@@ -46,9 +46,16 @@ String Version = "v1.2";
 #define REBOOT_MS	86400000	// force a daily reboot
 //#define REBOOT_MS	3600000		// 1h for testing
 
+// Poop Level History:
+// 9.2018: empty:450, full 935   -- Full dipped about 5" short of overflow
+// 7.2018: empty:420, full:1010  -- Based on Greg's math
+// 4.2018: empty:200, full:1024  -- Initial untested swags
+
 #define POOP_HYSTERESIS	5		// Amount poopLevel may vary without reporting
-#define POOP_EMPTY	420		// Raw value for empty tank (set after 7/2018 pump out)
-#define POOP_FULL	1010		// Raw value for full tank (calculated based on Greg's percentag 7/2018)
+#define POOP_EMPTY	450		// Raw value for empty tank
+#define POOP_FULL	935		// Raw value for full tank
+
+
 
 #define BUTTON_NONE	0		// no button pressed
 #define BUTTON_MENU	2
