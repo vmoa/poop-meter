@@ -52,7 +52,7 @@ String Version = "v1.4";
 // 4.2018: empty:200, full:1024  -- Initial untested swags
 
 #define POOP_HYSTERESIS	5		// Amount poopLevel may vary without reporting
-#define POOP_EMPTY	450		// Raw value for empty tank
+#define POOP_EMPTY	420		// Raw value for empty tank
 #define POOP_FULL	935		// Raw value for full tank
 
 
