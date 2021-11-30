@@ -51,6 +51,13 @@ sub doLog($) {
 	printf LOG "%04d-%02d-%02d %02d:%02d:%02d %s\n",1900+$now[5], 1+$now[4], $now[3], $now[2], $now[1], $now[0], join(' ', @_);
 }
 
+my $lastPageTime;
+my $oneHour = 60*60;
+my $oneDay = 60*60*24;
+my $oneWeek = 60*60*24*7;
+sub lastNotify {
+	return(time - $lastPageTime);
+}
 
 while (1) {
 
@@ -58,9 +65,27 @@ while (1) {
 	my $string = $port->lookfor();
 	$port->lookclear; # needed to prevent blocking
 
+	my $lastPct;
+
 	if ($string) {
+		# [83007275] Poop Code Green: 2% (abs:431) Brt:0 But:0 Low:1 Hi:1023 EEwrites:118 Reboot:0.94h
 		chomp($string);
-		doLog($string);
+
+		my $pageFlag;
+		if ($string =~ /(\d+)%/) {
+			my $pct = $1;
+			if (($pct > $lastPct+10 || $pct < $lastPct-10) ||
+			    ($pct > 90 && lastNotify() > $oneHour) ||
+			    ($pct > 75 && lastNotify() > $oneDay) ||
+			    (lastNotify() > $oneWeek)) {
+				system("/usr/local/bin/pagedave Poop meter reads $pct%");
+				$pageFlag = 'PAGE';
+				$lastPageTime = time;
+			}
+			$lastPct = $pct;
+		}
+
+		doLog($string, $pageFlag);
 	}
 
 	sleep (1);
