@@ -85,7 +85,7 @@ while (1) {
 			$lastPct = $pct;
 		}
 
-		doLog($string, $pageFlag);
+		doLog(join(' ', $string, $pageFlag));
 	}
 
 	sleep (1);
