@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+#
+# Attach to the poop meter serial port and log messages
+# Periocially send poop level to Sonic
+# Page or send email as we reach danger levels (or do we let Sonic do that?)
+
+use strict;
+use Device::SerialPort;
+
+die "Try running as root\n" unless ($< == 0);
+
+my $symlink = '/var/log/poop/poop.log';  # Link to current log
+
+my @dev = qw( /dev/ttyACM0 /dev/ttyACM1 LAST );
+my $dev;
+foreach my $d ( @dev ) {
+	if (-e $d) {
+		$dev = $d;
+		last;
+	}
+}
+die "Cannot find a device!\n"  if ($dev eq 'LAST');;
+
+my $rate = 115200;
+
+# sudo screen /dev/ttyACM0 115200
+# Screen info: (1,43)/(247,43)+1024 +flow UTF-8 {RTS (CTS) DTR !DSR (!CD)} 0(ttyACM0)
+warn "Connecting to $dev at $rate\n";
+my $port = Device::SerialPort->new($dev);
+$port->baudrate($rate);
+$port->databits(7);
+$port->parity("none");
+$port->stopbits(1);
+die "Cannot connect to $dev\n" unless ($port);
+
+my $lastDay = -1;
+sub doLog($) {
+	my @now = localtime(time);
+
+	if ($lastDay != $now[3]) {
+		my $logdir = sprintf '/var/log/poop/%04d-%02d', 1900+$now[5], 1+$now[4];
+		my $logfn = sprintf '%s/poop-%02d.log', $logdir, $now[3];
+		system("mkdir -p $logdir") unless (-d $logdir);
+		open(LOG, '>>', $logfn) || warn "$logfn: $!\n";;
+		select(LOG); $| = 1; select(STDOUT);
+		unlink($symlink);
+		link($logfn, $symlink);
+		$lastDay = $now[3];
+	}
+
+	printf LOG "%04d-%02d-%02d %02d:%02d:%02d %s\n",1900+$now[5], 1+$now[4], $now[3], $now[2], $now[1], $now[0], join(' ', @_);
+}
+
+my $lastPageTime;
+my $oneHour = 60*60;
+my $oneDay = 60*60*24;
+my $oneWeek = 60*60*24*7;
+sub lastNotify {
+	return(time - $lastPageTime);
+}
+
+while (1) {
+
+	# Non-blocking
+	my $string = $port->lookfor();
+	$port->lookclear; # needed to prevent blocking
+
+	my $lastPct;
+
+	if ($string) {
+		# [83007275] Poop Code Green: 2% (abs:431) Brt:0 But:0 Low:1 Hi:1023 EEwrites:118 Reboot:0.94h
+		chomp($string);
+
+		my $pageFlag;
+		if ($string =~ /(\d+)%/) {
+			my $pct = $1;
+			if (($pct > $lastPct+10 || $pct < $lastPct-10) ||
+			    ($pct > 90 && lastNotify() > $oneHour) ||
+			    ($pct > 75 && lastNotify() > $oneDay) ||
+			    (lastNotify() > $oneWeek)) {
+				system("/usr/local/bin/pagedave Poop meter reads $pct%");
+				$pageFlag = 'PAGE';
+				$lastPageTime = time;
+			}
+			$lastPct = $pct;
+		}
+
+		doLog(join(' ', $string, $pageFlag));
+	}
+
+	sleep (1);
+}
+
+
+

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Compiled source #
 ###################
 *.com
@@ -48,3 +49,8 @@ Session.vim
 ###########################
 RCS
 *,v
+=======
+*.swp
+foo*
+id_rsa*
+>>>>>>> poop/master

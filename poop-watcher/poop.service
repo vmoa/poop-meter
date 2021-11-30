@@ -1,0 +1,25 @@
+#
+# Simple start/stop script for the RFO poopwatcher service
+#
+# Place this file in /etc/systemd/system
+#	sudo mv poop.service /etc/systemd/system/
+# and enable with systemctl:
+#	sudo systemctl enable poop.service
+# The final file will wind up in /lib/systemd/system
+#
+
+[Unit]
+Description=RFO Poop Watcher Service
+After=local-fs.target network.target remote-fs.target
+Requires=local-fs.target network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/poopwatcher
+ExecStop=/usr/bin/pkill poopwatcher
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
