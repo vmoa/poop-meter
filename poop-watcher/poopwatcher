@@ -11,7 +11,7 @@ die "Try running as root\n" unless ($< == 0);
 
 my $symlink = '/var/log/poop/poop.log';  # Link to current log
 
-my @dev = qw( /dev/ttyACM0 /dev/ttyACM1 LAST );
+my @dev = qw( /dev/ttyACM0 /dev/ttyACM1 );
 my $dev;
 foreach my $d ( @dev ) {
 	if (-e $d) {
@@ -19,7 +19,7 @@ foreach my $d ( @dev ) {
 		last;
 	}
 }
-die "Cannot find a device!\n"  if ($dev eq 'LAST');;
+die "Cannot find a device!\n" unless ($dev);
 
 my $rate = 115200;
 
@@ -51,6 +51,7 @@ sub doLog($) {
 	printf LOG "%04d-%02d-%02d %02d:%02d:%02d %s\n",1900+$now[5], 1+$now[4], $now[3], $now[2], $now[1], $now[0], join(' ', @_);
 }
 
+my $lastPct;
 my $lastPageTime;
 my $oneHour = 60*60;
 my $oneDay = 60*60*24;
@@ -65,8 +66,6 @@ while (1) {
 	my $string = $port->lookfor();
 	$port->lookclear; # needed to prevent blocking
 
-	my $lastPct;
-
 	if ($string) {
 		# [83007275] Poop Code Green: 2% (abs:431) Brt:0 But:0 Low:1 Hi:1023 EEwrites:118 Reboot:0.94h
 		chomp($string);
@@ -79,7 +78,7 @@ while (1) {
 			    ($pct > 75 && lastNotify() > $oneDay) ||
 			    (lastNotify() > $oneWeek)) {
 				system("/usr/local/bin/pagedave Poop meter reads $pct%");
-				$pageFlag = 'PAGE';
+				$pageFlag = "PAGE cur:$pct last:$lastPct since:" . lastNotify;
 				$lastPageTime = time;
 			}
 			$lastPct = $pct;
