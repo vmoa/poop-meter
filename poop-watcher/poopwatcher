@@ -68,7 +68,7 @@ while (1) {
 
 	if ($string) {
 		# [83007275] Poop Code Green: 2% (abs:431) Brt:0 But:0 Low:1 Hi:1023 EEwrites:118 Reboot:0.94h
-		#$string =~ s/\n|\r//g;  # chomp doesn't eat \r
+		$string =~ s/\n|\r//g;  # chomp doesn't eat \r
 
 		my $pageFlag;
 		if ($string =~ /Poop Code \w+: ([\d-]+)% \(abs:(\d+)\)/) {
