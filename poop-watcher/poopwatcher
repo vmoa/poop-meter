@@ -68,16 +68,17 @@ while (1) {
 
 	if ($string) {
 		# [83007275] Poop Code Green: 2% (abs:431) Brt:0 But:0 Low:1 Hi:1023 EEwrites:118 Reboot:0.94h
-		chomp($string);
+		#$string =~ s/\n|\r//g;  # chomp doesn't eat \r
 
 		my $pageFlag;
-		if ($string =~ /(\d+)%/) {
+		if ($string =~ /Poop Code \w+: ([\d-]+)% \(abs:(\d+)\)/) {
 			my $pct = $1;
+			my $abs = $2;
 			if (($pct > $lastPct+10 || $pct < $lastPct-10) ||
-			    ($pct > 90 && lastNotify() > $oneHour) ||
-			    ($pct > 75 && lastNotify() > $oneDay) ||
-			    (lastNotify() > $oneWeek)) {
-				system("/usr/local/bin/pagedave Poop meter reads $pct%");
+				($pct > 90 && lastNotify() > $oneHour) ||
+				($pct > 75 && lastNotify() > $oneDay) ||
+				(lastNotify() > $oneWeek)) {
+				system("/usr/local/bin/pagedave Poop meter reads $pct%, abs:$abs");
 				$pageFlag = "PAGE cur:$pct last:$lastPct since:" . lastNotify;
 				$lastPageTime = time;
 			}
