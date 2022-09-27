@@ -6,11 +6,11 @@ encoding utf-8
 Sheet 1 1
 Title "Poop Valve Controller"
 Date ""
-Rev "0.2 (draft)"
+Rev "0.3 (draft)"
 Comp "Robert Ferguson Observatory"
-Comment1 "v0.2 changed relay configuration"
-Comment2 "v0.1 initial release"
-Comment3 ""
+Comment1 "v0.3 pivot to manual override relay"
+Comment2 "v0.2 changed relay configuration"
+Comment3 "v0.1 initial release"
 Comment4 ""
 $EndDescr
 $Comp
@@ -123,36 +123,6 @@ F 3 "~" H 4100 2750 50  0001 C CNN
 	1    4100 2750
 	0    1    1    0   
 $EndComp
-$Comp
-L Switch:SW_DP3T SW?
-U 2 1 633498EC
-P 2300 4500
-F 0 "SW?" H 2300 4175 50  0001 C CNN
-F 1 "DP3T Momentary" H 2050 4350 50  0000 C CNN
-F 2 "" H 1675 4675 50  0001 C CNN
-F 3 "~" H 1675 4675 50  0001 C CNN
-	2    2300 4500
-	1    0    0    -1  
-$EndComp
-$Comp
-L Switch:SW_DP3T SW?
-U 1 1 6334755E
-P 2300 4100
-F 0 "SW?" H 2300 4291 50  0000 C CNN
-F 1 "SW_DP3T" H 2300 3866 50  0001 C CNN
-F 2 "" H 1675 4275 50  0001 C CNN
-F 3 "~" H 1675 4275 50  0001 C CNN
-	1    2300 4100
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2100 4100 1800 4100
-Wire Wire Line
-	1800 4100 1800 3600
-Wire Wire Line
-	1700 3700 1700 4500
-Wire Wire Line
-	1700 4500 2100 4500
 Wire Wire Line
 	3450 3200 3450 1950
 Wire Wire Line
@@ -267,34 +237,28 @@ NoConn ~ 5700 2550
 $Comp
 L power:+3.3V #PWR?
 U 1 1 634961D4
-P 4950 3700
-F 0 "#PWR?" H 4950 3550 50  0001 C CNN
-F 1 "+3.3V" H 4965 3873 50  0000 C CNN
-F 2 "" H 4950 3700 50  0001 C CNN
-F 3 "" H 4950 3700 50  0001 C CNN
-	1    4950 3700
+P 5200 3700
+F 0 "#PWR?" H 5200 3550 50  0001 C CNN
+F 1 "+3.3V" H 5215 3873 50  0000 C CNN
+F 2 "" H 5200 3700 50  0001 C CNN
+F 3 "" H 5200 3700 50  0001 C CNN
+	1    5200 3700
 	1    0    0    -1  
 $EndComp
 $Comp
 L myLib:Relay_Module K?
 U 1 1 632AF059
-P 4450 5200
-F 0 "K?" H 4400 4950 50  0000 L CNN
-F 1 "Actuate Relay" H 4450 5384 50  0000 C CNN
-F 2 "" H 4450 5200 50  0001 C CNN
-F 3 "" H 4450 5200 50  0001 C CNN
-	1    4450 5200
+P 4700 3950
+F 0 "K?" H 4350 4100 50  0000 L CNN
+F 1 "Enable Relays" H 4700 4200 50  0000 C CNN
+F 2 "" H 4700 3950 50  0001 C CNN
+F 3 "" H 4700 3950 50  0001 C CNN
+	1    4700 3950
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
 	7950 4400 7950 4650
 Connection ~ 7950 4400
-Wire Wire Line
-	1500 3700 1700 3700
-Wire Wire Line
-	1500 3600 1800 3600
-Wire Wire Line
-	1500 3400 3150 3400
 Wire Wire Line
 	1500 3300 3550 3300
 Wire Wire Line
@@ -467,8 +431,6 @@ Wire Wire Line
 	4700 2750 4700 3400
 Wire Wire Line
 	4700 2750 5100 2750
-Text Notes 1750 4800 0    50   ~ 0
-(ON)-ON-(ON)
 Wire Wire Line
 	3450 1950 3850 1950
 Wire Wire Line
@@ -487,7 +449,7 @@ Wire Wire Line
 Connection ~ 3850 2550
 Wire Wire Line
 	3850 2550 4800 2550
-NoConn ~ 4000 5150
+NoConn ~ 4250 3900
 NoConn ~ 5200 2450
 Text Notes 1500 3700 0    50   ~ 0
 yellow
@@ -508,10 +470,8 @@ Text Notes 6400 3300 0    50   ~ 0
 Valve Open
 Text Notes 6350 3400 0    50   ~ 0
 Valve Closed\n
-Text Notes 6500 3700 0    50   ~ 0
-Actuate
-Wire Notes Line rgb(132, 132, 132)
-	2300 4050 2300 4450
+Text Notes 6550 3600 0    50   ~ 0
+Enable
 $Comp
 L Device:Fuse_Small F?
 U 1 1 63320CD5
@@ -531,172 +491,389 @@ Connection ~ 1950 6400
 Wire Wire Line
 	1950 6400 2250 6400
 Wire Wire Line
-	2450 6400 3150 6400
-Wire Wire Line
 	1400 6750 1400 6800
 Wire Wire Line
 	1400 6800 1950 6800
 Wire Wire Line
 	1950 6800 3550 6800
 Connection ~ 1950 6800
-$Comp
-L myLib:Relay_Module K?
-U 1 1 63339078
-P 4450 4050
-F 0 "K?" H 4150 4200 50  0000 C CNN
-F 1 "Open/Close Relays" H 4450 4400 50  0000 C CNN
-F 2 "" H 4450 4050 50  0001 C CNN
-F 3 "" H 4450 4050 50  0001 C CNN
-	1    4450 4050
-	-1   0    0    -1  
-$EndComp
-$Comp
-L myLib:Relay_Module K?
-U 1 1 63339FE4
-P 4450 4450
-F 0 "K?" H 4150 4200 50  0000 C CNN
-F 1 "Polarity Reverse" H 4450 4150 50  0001 C CNN
-F 2 "" H 4450 4450 50  0001 C CNN
-F 3 "" H 4450 4450 50  0001 C CNN
-	1    4450 4450
-	-1   0    0    -1  
-$EndComp
-Wire Wire Line
-	3150 3400 3150 4000
-Wire Wire Line
-	3550 3400 3550 4200
-Wire Wire Line
-	2500 4100 4000 4100
-Wire Wire Line
-	2500 4500 4000 4500
-Wire Wire Line
-	2500 4000 3150 4000
-Connection ~ 3150 4000
-Wire Wire Line
-	2500 4200 3550 4200
-Connection ~ 3550 4200
-Wire Wire Line
-	2500 4400 3550 4400
-Connection ~ 3550 4400
-Wire Wire Line
-	3550 4400 3550 6800
-Wire Wire Line
-	2500 4600 3150 4600
-Connection ~ 3150 4600
-Wire Wire Line
-	3150 4000 3150 4600
-Wire Wire Line
-	3150 5250 4000 5250
-Connection ~ 3150 5250
-Wire Wire Line
-	3150 5250 3150 6400
-Wire Wire Line
-	3150 4600 3150 5250
-Text Notes 6350 3600 0    50   ~ 0
-Open/Close
+Text Notes 6350 3700 0    50   ~ 0
+Open-Close
 $Comp
 L power:GND #PWR?
 U 1 1 6339FA56
-P 5050 5450
-F 0 "#PWR?" H 5050 5200 50  0001 C CNN
-F 1 "GND" H 5055 5277 50  0000 C CNN
-F 2 "" H 5050 5450 50  0001 C CNN
-F 3 "" H 5050 5450 50  0001 C CNN
-	1    5050 5450
+P 5300 6050
+F 0 "#PWR?" H 5300 5800 50  0001 C CNN
+F 1 "GND" H 5305 5877 50  0000 C CNN
+F 2 "" H 5300 6050 50  0001 C CNN
+F 3 "" H 5300 6050 50  0001 C CNN
+	1    5300 6050
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4900 4000 4950 4000
+	5200 3900 5150 3900
 Wire Wire Line
-	4950 4000 4950 4400
-Wire Wire Line
-	4950 4400 4900 4400
-Connection ~ 4950 4000
-Wire Wire Line
-	4950 4400 4950 5150
-Wire Wire Line
-	4950 5150 4900 5150
-Connection ~ 4950 4400
-Wire Wire Line
-	4900 4200 5050 4200
-Wire Wire Line
-	5050 4200 5050 4600
-Wire Wire Line
-	4900 4600 5050 4600
-Connection ~ 5050 4600
-Wire Wire Line
-	5050 4600 5050 5350
-Wire Wire Line
-	4900 5350 5050 5350
-Connection ~ 5050 5350
-Wire Wire Line
-	5050 5350 5050 5450
+	5150 4100 5300 4100
 Wire Wire Line
 	6850 3700 6050 3700
 Wire Wire Line
-	6050 3700 6050 5250
-Wire Wire Line
-	6050 5250 4900 5250
-Wire Wire Line
 	6850 3600 5950 3600
+$Comp
+L myLib:Relay_Module K?
+U 1 1 63423895
+P 4700 4350
+F 0 "K?" H 4400 4100 50  0000 C CNN
+F 1 "Relay_Module" H 4700 4534 50  0001 C CNN
+F 2 "" H 4700 4350 50  0001 C CNN
+F 3 "" H 4700 4350 50  0001 C CNN
+	1    4700 4350
+	-1   0    0    -1  
+$EndComp
 Wire Wire Line
-	5950 3600 5950 4100
+	5200 4300 5150 4300
 Wire Wire Line
-	5950 4100 4900 4100
-Wire Wire Line
-	5950 4100 5950 4500
-Wire Wire Line
-	5950 4500 4900 4500
-Connection ~ 5950 4100
-Wire Wire Line
-	4950 3700 4950 4000
-Wire Wire Line
-	3800 4000 3800 4600
-Connection ~ 3800 4600
-Wire Wire Line
-	3800 4600 3800 5350
-Wire Wire Line
-	3800 4000 4000 4000
-Wire Wire Line
-	3800 4600 4000 4600
-Wire Wire Line
-	3800 5350 4000 5350
-Wire Wire Line
-	4000 4200 3900 4200
-Wire Wire Line
-	3900 4200 3900 4300
-Wire Wire Line
-	3900 4400 4000 4400
-Wire Wire Line
-	3550 4200 3550 4300
-Wire Wire Line
-	3900 4300 3550 4300
-Connection ~ 3900 4300
-Wire Wire Line
-	3900 4300 3900 4400
-Connection ~ 3550 4300
-Wire Wire Line
-	3550 4300 3550 4400
+	5150 4500 5300 4500
 Wire Notes Line
-	4050 3800 4050 4800
+	4300 3650 5100 3650
 Wire Notes Line
-	4050 4800 4850 4800
+	5100 3650 5100 4650
 Wire Notes Line
-	4850 4800 4850 3800
+	5100 4650 4300 4650
 Wire Notes Line
-	4850 3800 4050 3800
-Text Notes 700  7350 0    50   ~ 0
-Notes:\n1. SP3T switch is momenatry, closing pins 3-1 & 7-5 in one direction, 3-4 & 7-8 in the other, with return-to-center pins 3-2 & 7-6 when released.\n2. Open/Close relays operate in tandem and reverse the polarity of the 12VDC signal passing through the default (return-to-center) pins of the switch.\n3. Actuate relay conditionally supplies 12VDC to the Open/Close relays to actually operate the motor.
-Text Notes 2500 4000 0    50   ~ 0
-(open)
-Text Notes 2500 4200 0    50   ~ 0
-(close)
-Text Notes 2500 4400 0    50   ~ 0
-(open)
-Text Notes 2500 4600 0    50   ~ 0
-(close)
-Text Notes 2500 4100 0    50   ~ 0
-center
-Text Notes 2500 4500 0    50   ~ 0
-center
+	4300 4650 4300 3650
+NoConn ~ 4250 4300
+Wire Wire Line
+	2450 6400 3450 6400
+Wire Wire Line
+	1500 3400 3450 3400
+$Comp
+L myLib:Relay_Module K?
+U 1 1 639015D0
+P 2450 4150
+F 0 "K?" H 2150 4300 50  0000 C CNN
+F 1 "Override Relays" H 2450 4400 50  0000 C CNN
+F 2 "" H 2450 4150 50  0001 C CNN
+F 3 "" H 2450 4150 50  0001 C CNN
+	1    2450 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L myLib:Relay_Module K?
+U 1 1 639015D6
+P 2450 4550
+F 0 "K?" H 2150 4300 50  0000 C CNN
+F 1 "Polarity Reverse" H 2450 4250 50  0001 C CNN
+F 2 "" H 2450 4550 50  0001 C CNN
+F 3 "" H 2450 4550 50  0001 C CNN
+	1    2450 4550
+	1    0    0    -1  
+$EndComp
+Wire Notes Line
+	2050 3850 2850 3850
+Wire Notes Line
+	2050 4850 2850 4850
+Wire Notes Line
+	2850 3850 2850 4850
+Wire Notes Line
+	2050 3850 2050 4850
+$Comp
+L Switch:SW_SPDT_MSM SW?
+U 1 1 6399F730
+P 2450 5400
+F 0 "SW?" H 2550 5600 50  0000 C CNN
+F 1 "Open-Close Momentary" H 2450 4850 50  0000 C CNN
+F 2 "" H 2450 5400 50  0001 C CNN
+F 3 "~" H 2450 5400 50  0001 C CNN
+	1    2450 5400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_SPDT_MSM SW?
+U 1 1 639A09F8
+P 2450 5750
+F 0 "SW?" H 2450 5550 50  0001 C CNN
+F 1 "SW_SPDT_MSM" H 2450 5944 50  0001 C CNN
+F 2 "" H 2450 5750 50  0001 C CNN
+F 3 "~" H 2450 5750 50  0001 C CNN
+	1    2450 5750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2650 5500 2800 5500
+Wire Wire Line
+	2800 5650 2650 5650
+Wire Wire Line
+	2650 5300 2900 5300
+Wire Wire Line
+	2900 5850 2650 5850
+Wire Wire Line
+	2800 5500 2800 5550
+Wire Wire Line
+	2800 5550 3550 5550
+Connection ~ 2800 5550
+Wire Wire Line
+	2800 5550 2800 5650
+Connection ~ 3550 5550
+Wire Wire Line
+	2250 5400 2200 5400
+Wire Wire Line
+	2200 5400 2200 5100
+Wire Wire Line
+	2200 5100 3150 5100
+Wire Wire Line
+	3150 4300 2900 4300
+Wire Wire Line
+	2250 5750 2100 5750
+Wire Wire Line
+	2100 5750 2100 5000
+Wire Wire Line
+	2100 5000 3050 5000
+Wire Wire Line
+	3050 5000 3050 4700
+Wire Wire Line
+	3050 4700 2900 4700
+Wire Wire Line
+	2900 5300 2900 5350
+Wire Wire Line
+	2900 5350 3450 5350
+Connection ~ 2900 5350
+Connection ~ 3450 5350
+Wire Wire Line
+	3150 4200 2900 4200
+Wire Wire Line
+	1500 3700 3150 3700
+Wire Wire Line
+	3250 3600 3250 4600
+Wire Wire Line
+	3250 4600 2900 4600
+Wire Wire Line
+	1500 3600 3250 3600
+$Comp
+L power:GND #PWR?
+U 1 1 63B4DD6C
+P 1850 4700
+F 0 "#PWR?" H 1850 4450 50  0001 C CNN
+F 1 "GND" H 1855 4527 50  0000 C CNN
+F 2 "" H 1850 4700 50  0001 C CNN
+F 3 "" H 1850 4700 50  0001 C CNN
+	1    1850 4700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2000 4700 1850 4700
+Wire Wire Line
+	1850 4700 1850 4300
+Wire Wire Line
+	1850 4300 2000 4300
+Connection ~ 1850 4700
+Wire Wire Line
+	1950 4100 2000 4100
+Wire Wire Line
+	1950 4100 1950 4500
+Wire Wire Line
+	1950 4500 2000 4500
+$Comp
+L power:+3.3V #PWR?
+U 1 1 63B8FE1E
+P 800 4450
+F 0 "#PWR?" H 800 4300 50  0001 C CNN
+F 1 "+3.3V" H 815 4623 50  0000 C CNN
+F 2 "" H 800 4450 50  0001 C CNN
+F 3 "" H 800 4450 50  0001 C CNN
+	1    800  4450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 63B9109C
+P 800 4750
+F 0 "#PWR?" H 800 4500 50  0001 C CNN
+F 1 "GND" H 805 4577 50  0000 C CNN
+F 2 "" H 800 4750 50  0001 C CNN
+F 3 "" H 800 4750 50  0001 C CNN
+	1    800  4750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1000 4700 800  4700
+Wire Wire Line
+	800  4700 800  4750
+Wire Wire Line
+	800  4450 800  4500
+Wire Wire Line
+	800  4500 1000 4500
+Wire Wire Line
+	1400 4600 1750 4600
+Wire Wire Line
+	1750 4600 1750 4200
+Wire Wire Line
+	1750 4200 2000 4200
+Connection ~ 1750 4600
+Wire Wire Line
+	1750 4600 2000 4600
+$Comp
+L Switch:SW_SPDT SW?
+U 1 1 63AD73BF
+P 1200 4600
+F 0 "SW?" H 1000 4400 50  0000 C CNN
+F 1 "Override" H 1350 4400 50  0000 C CNN
+F 2 "" H 1200 4600 50  0001 C CNN
+F 3 "~" H 1200 4600 50  0001 C CNN
+	1    1200 4600
+	-1   0    0    -1  
+$EndComp
+Wire Notes Line
+	2450 5400 2450 5700
+$Comp
+L power:+3.3V #PWR?
+U 1 1 63B4D62E
+P 1850 4100
+F 0 "#PWR?" H 1850 3950 50  0001 C CNN
+F 1 "+3.3V" H 1865 4273 50  0000 C CNN
+F 2 "" H 1850 4100 50  0001 C CNN
+F 3 "" H 1850 4100 50  0001 C CNN
+	1    1850 4100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1950 4100 1850 4100
+Connection ~ 1950 4100
+Text Notes 900  4450 0    50   ~ 0
+RPi Ops
+Wire Wire Line
+	5200 3700 5200 3900
+$Comp
+L myLib:Relay_Module K?
+U 1 1 63D2BA9E
+P 4700 5400
+F 0 "K?" H 4400 5550 50  0000 C CNN
+F 1 "Open-Close Relays" H 4700 5650 50  0000 C CNN
+F 2 "" H 4700 5400 50  0001 C CNN
+F 3 "" H 4700 5400 50  0001 C CNN
+	1    4700 5400
+	-1   0    0    -1  
+$EndComp
+$Comp
+L myLib:Relay_Module K?
+U 1 1 63D2BAA4
+P 4700 5800
+F 0 "K?" H 4400 5550 50  0000 C CNN
+F 1 "Polarity Reverse" H 4700 5500 50  0001 C CNN
+F 2 "" H 4700 5800 50  0001 C CNN
+F 3 "" H 4700 5800 50  0001 C CNN
+	1    4700 5800
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5150 5350 5200 5350
+Wire Wire Line
+	5200 5750 5150 5750
+Wire Wire Line
+	5150 5950 5300 5950
+Wire Notes Line
+	4300 5100 5100 5100
+Wire Notes Line
+	4300 6100 5100 6100
+Wire Notes Line
+	5100 5100 5100 6100
+Wire Notes Line
+	4300 5100 4300 6100
+Wire Wire Line
+	3450 3400 3450 5350
+Wire Wire Line
+	3550 3400 3550 5550
+Connection ~ 5200 3900
+Connection ~ 5200 4300
+Connection ~ 5300 4500
+Wire Wire Line
+	2900 5350 2900 5850
+Wire Wire Line
+	5300 4100 5300 4500
+Wire Wire Line
+	5300 4500 5300 5550
+Connection ~ 5300 5950
+Wire Wire Line
+	5300 5950 5300 6050
+Wire Wire Line
+	5200 5350 5200 5750
+Connection ~ 5200 5350
+Wire Wire Line
+	5150 5550 5300 5550
+Connection ~ 5300 5550
+Wire Wire Line
+	5300 5550 5300 5950
+Wire Wire Line
+	3150 3700 3150 4200
+Wire Wire Line
+	3150 4300 3150 5100
+Wire Wire Line
+	2900 4100 4250 4100
+Wire Wire Line
+	2900 4500 4250 4500
+Wire Wire Line
+	4250 5450 4200 5450
+Wire Wire Line
+	4200 5450 4200 4400
+Wire Wire Line
+	4200 4400 4250 4400
+Wire Wire Line
+	4250 5850 4100 5850
+Wire Wire Line
+	4100 5850 4100 4000
+Wire Wire Line
+	4100 4000 4250 4000
+Wire Wire Line
+	5200 3900 5200 4300
+Wire Wire Line
+	5200 4300 5200 5350
+Wire Wire Line
+	5950 3600 5950 4000
+Wire Wire Line
+	5950 4000 5150 4000
+Wire Wire Line
+	5950 4000 5950 4400
+Wire Wire Line
+	5950 4400 5150 4400
+Connection ~ 5950 4000
+Wire Wire Line
+	6050 3700 6050 5450
+Connection ~ 6050 5450
+Wire Wire Line
+	6050 5450 5150 5450
+Wire Wire Line
+	6050 5450 6050 5850
+Wire Wire Line
+	6050 5850 5150 5850
+Wire Wire Line
+	3750 5350 4250 5350
+Wire Wire Line
+	3750 5950 4250 5950
+Wire Wire Line
+	3850 5550 4250 5550
+Wire Wire Line
+	3850 5750 4250 5750
+Wire Wire Line
+	3750 5350 3750 5450
+Wire Wire Line
+	3450 5350 3450 5450
+Wire Wire Line
+	3550 5550 3550 5650
+Wire Wire Line
+	3850 5550 3850 5650
+Wire Wire Line
+	3450 5450 3750 5450
+Connection ~ 3450 5450
+Wire Wire Line
+	3450 5450 3450 6400
+Connection ~ 3750 5450
+Wire Wire Line
+	3750 5450 3750 5950
+Wire Wire Line
+	3550 5650 3850 5650
+Connection ~ 3550 5650
+Wire Wire Line
+	3550 5650 3550 6800
+Connection ~ 3850 5650
+Wire Wire Line
+	3850 5650 3850 5750
 $EndSCHEMATC
