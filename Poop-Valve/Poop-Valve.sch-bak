@@ -237,23 +237,23 @@ NoConn ~ 5700 2550
 $Comp
 L power:+3.3V #PWR?
 U 1 1 634961D4
-P 4950 3700
-F 0 "#PWR?" H 4950 3550 50  0001 C CNN
-F 1 "+3.3V" H 4965 3873 50  0000 C CNN
-F 2 "" H 4950 3700 50  0001 C CNN
-F 3 "" H 4950 3700 50  0001 C CNN
-	1    4950 3700
+P 5200 3700
+F 0 "#PWR?" H 5200 3550 50  0001 C CNN
+F 1 "+3.3V" H 5215 3873 50  0000 C CNN
+F 2 "" H 5200 3700 50  0001 C CNN
+F 3 "" H 5200 3700 50  0001 C CNN
+	1    5200 3700
 	1    0    0    -1  
 $EndComp
 $Comp
 L myLib:Relay_Module K?
 U 1 1 632AF059
-P 4450 5200
-F 0 "K?" H 4100 5350 50  0000 L CNN
-F 1 "Enable Relays" H 4450 5450 50  0000 C CNN
-F 2 "" H 4450 5200 50  0001 C CNN
-F 3 "" H 4450 5200 50  0001 C CNN
-	1    4450 5200
+P 4700 3950
+F 0 "K?" H 4350 4100 50  0000 L CNN
+F 1 "Enable Relays" H 4700 4200 50  0000 C CNN
+F 2 "" H 4700 3950 50  0001 C CNN
+F 3 "" H 4700 3950 50  0001 C CNN
+	1    4700 3950
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
@@ -449,7 +449,7 @@ Wire Wire Line
 Connection ~ 3850 2550
 Wire Wire Line
 	3850 2550 4800 2550
-NoConn ~ 4000 5150
+NoConn ~ 4250 3900
 NoConn ~ 5200 2450
 Text Notes 1500 3700 0    50   ~ 0
 yellow
@@ -470,7 +470,7 @@ Text Notes 6400 3300 0    50   ~ 0
 Valve Open
 Text Notes 6350 3400 0    50   ~ 0
 Valve Closed\n
-Text Notes 6550 3700 0    50   ~ 0
+Text Notes 6550 3600 0    50   ~ 0
 Enable
 $Comp
 L Device:Fuse_Small F?
@@ -497,156 +497,51 @@ Wire Wire Line
 Wire Wire Line
 	1950 6800 3550 6800
 Connection ~ 1950 6800
-$Comp
-L myLib:Relay_Module K?
-U 1 1 63339078
-P 4450 4050
-F 0 "K?" H 4150 4200 50  0000 C CNN
-F 1 "Open-Close Relays" H 4450 4300 50  0000 C CNN
-F 2 "" H 4450 4050 50  0001 C CNN
-F 3 "" H 4450 4050 50  0001 C CNN
-	1    4450 4050
-	-1   0    0    -1  
-$EndComp
-$Comp
-L myLib:Relay_Module K?
-U 1 1 63339FE4
-P 4450 4450
-F 0 "K?" H 4150 4200 50  0000 C CNN
-F 1 "Polarity Reverse" H 4450 4150 50  0001 C CNN
-F 2 "" H 4450 4450 50  0001 C CNN
-F 3 "" H 4450 4450 50  0001 C CNN
-	1    4450 4450
-	-1   0    0    -1  
-$EndComp
-Text Notes 6350 3600 0    50   ~ 0
+Text Notes 6350 3700 0    50   ~ 0
 Open-Close
 $Comp
 L power:GND #PWR?
 U 1 1 6339FA56
-P 5050 5900
-F 0 "#PWR?" H 5050 5650 50  0001 C CNN
-F 1 "GND" H 5055 5727 50  0000 C CNN
-F 2 "" H 5050 5900 50  0001 C CNN
-F 3 "" H 5050 5900 50  0001 C CNN
-	1    5050 5900
+P 5300 6050
+F 0 "#PWR?" H 5300 5800 50  0001 C CNN
+F 1 "GND" H 5305 5877 50  0000 C CNN
+F 2 "" H 5300 6050 50  0001 C CNN
+F 3 "" H 5300 6050 50  0001 C CNN
+	1    5300 6050
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4900 4000 4950 4000
+	5200 3900 5150 3900
 Wire Wire Line
-	4950 4000 4950 4400
-Wire Wire Line
-	4950 4400 4900 4400
-Connection ~ 4950 4000
-Wire Wire Line
-	4950 4400 4950 5150
-Wire Wire Line
-	4950 5150 4900 5150
-Connection ~ 4950 4400
-Wire Wire Line
-	4900 4200 5050 4200
-Wire Wire Line
-	5050 4200 5050 4600
-Wire Wire Line
-	4900 4600 5050 4600
-Connection ~ 5050 4600
-Wire Wire Line
-	5050 4600 5050 5350
-Wire Wire Line
-	4900 5350 5050 5350
-Connection ~ 5050 5350
+	5150 4100 5300 4100
 Wire Wire Line
 	6850 3700 6050 3700
 Wire Wire Line
-	6050 3700 6050 5250
-Wire Wire Line
-	6050 5250 4900 5250
-Wire Wire Line
 	6850 3600 5950 3600
-Wire Wire Line
-	5950 3600 5950 4100
-Wire Wire Line
-	5950 4100 4900 4100
-Wire Wire Line
-	5950 4100 5950 4500
-Wire Wire Line
-	5950 4500 4900 4500
-Connection ~ 5950 4100
-Wire Wire Line
-	4950 3700 4950 4000
-Wire Wire Line
-	3800 4000 3800 4600
-Connection ~ 3800 4600
-Wire Wire Line
-	3800 4600 3800 5350
-Wire Wire Line
-	3800 4000 4000 4000
-Wire Wire Line
-	3800 4600 4000 4600
-Wire Wire Line
-	3800 5350 4000 5350
-Wire Wire Line
-	4000 4200 3900 4200
-Wire Wire Line
-	3900 4400 4000 4400
 $Comp
 L myLib:Relay_Module K?
 U 1 1 63423895
-P 4450 5600
-F 0 "K?" H 4150 5350 50  0000 C CNN
-F 1 "Relay_Module" H 4450 5784 50  0001 C CNN
-F 2 "" H 4450 5600 50  0001 C CNN
-F 3 "" H 4450 5600 50  0001 C CNN
-	1    4450 5600
+P 4700 4350
+F 0 "K?" H 4400 4100 50  0000 C CNN
+F 1 "Relay_Module" H 4700 4534 50  0001 C CNN
+F 2 "" H 4700 4350 50  0001 C CNN
+F 3 "" H 4700 4350 50  0001 C CNN
+	1    4700 4350
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	3550 5650 4000 5650
-Connection ~ 3550 5650
+	5200 4300 5150 4300
 Wire Wire Line
-	3550 5650 3550 6800
-Wire Wire Line
-	3900 4400 3900 5750
-Wire Wire Line
-	3900 5750 4000 5750
-Connection ~ 3900 4400
-Wire Wire Line
-	3900 4200 3900 4400
-Wire Wire Line
-	5050 5350 5050 5750
-Wire Wire Line
-	4900 5650 6050 5650
-Wire Wire Line
-	6050 5650 6050 5250
-Connection ~ 6050 5250
-Wire Wire Line
-	4950 5150 4950 5550
-Wire Wire Line
-	4950 5550 4900 5550
-Connection ~ 4950 5150
-Wire Wire Line
-	4900 5750 5050 5750
-Connection ~ 5050 5750
-Wire Wire Line
-	5050 5750 5050 5900
+	5150 4500 5300 4500
 Wire Notes Line
-	4050 3750 4850 3750
+	4300 3650 5100 3650
 Wire Notes Line
-	4050 4900 4850 4900
+	5100 3650 5100 4650
 Wire Notes Line
-	4850 4900 4850 5900
+	5100 4650 4300 4650
 Wire Notes Line
-	4850 5900 4050 5900
-Wire Notes Line
-	4050 5900 4050 4900
-Wire Notes Line
-	4050 4750 4850 4750
-Wire Notes Line
-	4850 3750 4850 4750
-Wire Notes Line
-	4050 3750 4050 4750
-NoConn ~ 4000 5550
+	4300 4650 4300 3650
+NoConn ~ 4250 4300
 Wire Wire Line
 	2450 6400 3450 6400
 Wire Wire Line
@@ -714,23 +609,17 @@ Wire Wire Line
 Wire Wire Line
 	2800 5500 2800 5550
 Wire Wire Line
-	3450 3400 3450 5250
-Wire Wire Line
 	2800 5550 3550 5550
 Connection ~ 2800 5550
 Wire Wire Line
 	2800 5550 2800 5650
 Connection ~ 3550 5550
 Wire Wire Line
-	3550 5550 3550 5650
-Wire Wire Line
 	2250 5400 2200 5400
 Wire Wire Line
 	2200 5400 2200 5100
 Wire Wire Line
 	2200 5100 3150 5100
-Wire Wire Line
-	3150 5100 3150 4300
 Wire Wire Line
 	3150 4300 2900 4300
 Wire Wire Line
@@ -746,24 +635,9 @@ Wire Wire Line
 Wire Wire Line
 	2900 5300 2900 5350
 Wire Wire Line
-	3550 3400 3550 5550
-Wire Wire Line
 	2900 5350 3450 5350
 Connection ~ 2900 5350
-Wire Wire Line
-	2900 5350 2900 5850
 Connection ~ 3450 5350
-Wire Wire Line
-	3450 5350 3450 6400
-Wire Wire Line
-	4000 5250 3450 5250
-Connection ~ 3450 5250
-Wire Wire Line
-	3450 5250 3450 5350
-Wire Wire Line
-	4000 4100 2900 4100
-Wire Wire Line
-	2900 4500 4000 4500
 Wire Wire Line
 	3150 4200 2900 4200
 Wire Wire Line
@@ -862,10 +736,144 @@ F 3 "" H 1850 4100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	3150 3700 3150 4200
-Wire Wire Line
 	1950 4100 1850 4100
 Connection ~ 1950 4100
 Text Notes 900  4450 0    50   ~ 0
 RPi Ops
+Wire Wire Line
+	5200 3700 5200 3900
+$Comp
+L myLib:Relay_Module K?
+U 1 1 63D2BA9E
+P 4700 5400
+F 0 "K?" H 4400 5550 50  0000 C CNN
+F 1 "Open-Close Relays" H 4700 5650 50  0000 C CNN
+F 2 "" H 4700 5400 50  0001 C CNN
+F 3 "" H 4700 5400 50  0001 C CNN
+	1    4700 5400
+	-1   0    0    -1  
+$EndComp
+$Comp
+L myLib:Relay_Module K?
+U 1 1 63D2BAA4
+P 4700 5800
+F 0 "K?" H 4400 5550 50  0000 C CNN
+F 1 "Polarity Reverse" H 4700 5500 50  0001 C CNN
+F 2 "" H 4700 5800 50  0001 C CNN
+F 3 "" H 4700 5800 50  0001 C CNN
+	1    4700 5800
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5150 5350 5200 5350
+Wire Wire Line
+	5200 5750 5150 5750
+Wire Wire Line
+	5150 5950 5300 5950
+Wire Notes Line
+	4300 5100 5100 5100
+Wire Notes Line
+	4300 6100 5100 6100
+Wire Notes Line
+	5100 5100 5100 6100
+Wire Notes Line
+	4300 5100 4300 6100
+Wire Wire Line
+	3450 3400 3450 5350
+Wire Wire Line
+	3550 3400 3550 5550
+Connection ~ 5200 3900
+Connection ~ 5200 4300
+Connection ~ 5300 4500
+Wire Wire Line
+	2900 5350 2900 5850
+Wire Wire Line
+	5300 4100 5300 4500
+Wire Wire Line
+	5300 4500 5300 5550
+Connection ~ 5300 5950
+Wire Wire Line
+	5300 5950 5300 6050
+Wire Wire Line
+	5200 5350 5200 5750
+Connection ~ 5200 5350
+Wire Wire Line
+	5150 5550 5300 5550
+Connection ~ 5300 5550
+Wire Wire Line
+	5300 5550 5300 5950
+Wire Wire Line
+	3150 3700 3150 4200
+Wire Wire Line
+	3150 4300 3150 5100
+Wire Wire Line
+	2900 4100 4250 4100
+Wire Wire Line
+	2900 4500 4250 4500
+Wire Wire Line
+	4250 5450 4200 5450
+Wire Wire Line
+	4200 5450 4200 4400
+Wire Wire Line
+	4200 4400 4250 4400
+Wire Wire Line
+	4250 5850 4100 5850
+Wire Wire Line
+	4100 5850 4100 4000
+Wire Wire Line
+	4100 4000 4250 4000
+Wire Wire Line
+	5200 3900 5200 4300
+Wire Wire Line
+	5200 4300 5200 5350
+Wire Wire Line
+	5950 3600 5950 4000
+Wire Wire Line
+	5950 4000 5150 4000
+Wire Wire Line
+	5950 4000 5950 4400
+Wire Wire Line
+	5950 4400 5150 4400
+Connection ~ 5950 4000
+Wire Wire Line
+	6050 3700 6050 5450
+Connection ~ 6050 5450
+Wire Wire Line
+	6050 5450 5150 5450
+Wire Wire Line
+	6050 5450 6050 5850
+Wire Wire Line
+	6050 5850 5150 5850
+Wire Wire Line
+	3750 5350 4250 5350
+Wire Wire Line
+	3750 5950 4250 5950
+Wire Wire Line
+	3850 5550 4250 5550
+Wire Wire Line
+	3850 5750 4250 5750
+Wire Wire Line
+	3750 5350 3750 5450
+Wire Wire Line
+	3450 5350 3450 5450
+Wire Wire Line
+	3550 5550 3550 5650
+Wire Wire Line
+	3850 5550 3850 5650
+Wire Wire Line
+	3450 5450 3750 5450
+Connection ~ 3450 5450
+Wire Wire Line
+	3450 5450 3450 6400
+Connection ~ 3750 5450
+Wire Wire Line
+	3750 5450 3750 5950
+Wire Wire Line
+	3550 5650 3850 5650
+Connection ~ 3550 5650
+Wire Wire Line
+	3550 5650 3550 6800
+Connection ~ 3850 5650
+Wire Wire Line
+	3850 5650 3850 5750
 $EndSCHEMATC

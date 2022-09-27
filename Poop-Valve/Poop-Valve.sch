@@ -466,10 +466,10 @@ Text Notes 4150 2050 0    50   ~ 0
 Valve Open
 Text Notes 4100 2650 0    50   ~ 0
 Valve Closed
-Text Notes 6400 3300 0    50   ~ 0
-Valve Open
-Text Notes 6350 3400 0    50   ~ 0
-Valve Closed\n
+Text Notes 6150 3300 0    50   ~ 0
+Sense Valve Open
+Text Notes 6100 3400 0    50   ~ 0
+Sense Valve Closed\n
 Text Notes 6550 3600 0    50   ~ 0
 Enable
 $Comp
@@ -497,8 +497,8 @@ Wire Wire Line
 Wire Wire Line
 	1950 6800 3550 6800
 Connection ~ 1950 6800
-Text Notes 6350 3700 0    50   ~ 0
-Open-Close
+Text Notes 6300 3700 0    50   ~ 0
+* Open-Close
 $Comp
 L power:GND #PWR?
 U 1 1 6339FA56
@@ -598,21 +598,6 @@ F 3 "~" H 2450 5750 50  0001 C CNN
 	1    2450 5750
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	2650 5500 2800 5500
-Wire Wire Line
-	2800 5650 2650 5650
-Wire Wire Line
-	2650 5300 2900 5300
-Wire Wire Line
-	2900 5850 2650 5850
-Wire Wire Line
-	2800 5500 2800 5550
-Wire Wire Line
-	2800 5550 3550 5550
-Connection ~ 2800 5550
-Wire Wire Line
-	2800 5550 2800 5650
 Connection ~ 3550 5550
 Wire Wire Line
 	2250 5400 2200 5400
@@ -632,11 +617,6 @@ Wire Wire Line
 	3050 5000 3050 4700
 Wire Wire Line
 	3050 4700 2900 4700
-Wire Wire Line
-	2900 5300 2900 5350
-Wire Wire Line
-	2900 5350 3450 5350
-Connection ~ 2900 5350
 Connection ~ 3450 5350
 Wire Wire Line
 	3150 4200 2900 4200
@@ -786,8 +766,6 @@ Connection ~ 5200 3900
 Connection ~ 5200 4300
 Connection ~ 5300 4500
 Wire Wire Line
-	2900 5350 2900 5850
-Wire Wire Line
 	5300 4100 5300 4500
 Wire Wire Line
 	5300 4500 5300 5550
@@ -876,4 +854,34 @@ Wire Wire Line
 Connection ~ 3850 5650
 Wire Wire Line
 	3850 5650 3850 5750
+Text Notes 2650 5300 0    50   ~ 0
+Open
+Text Notes 2650 5500 0    50   ~ 0
+Close
+Text Notes 2650 5400 0    50   ~ 0
+Center
+Wire Wire Line
+	2950 5300 2950 5350
+Connection ~ 2950 5350
+Wire Wire Line
+	2950 5350 3450 5350
+Wire Wire Line
+	2950 5350 2950 5850
+Wire Wire Line
+	2850 5650 2850 5550
+Connection ~ 2850 5550
+Wire Wire Line
+	2850 5550 3550 5550
+Wire Wire Line
+	2850 5550 2850 5500
+Wire Wire Line
+	2650 5500 2850 5500
+Wire Wire Line
+	2650 5650 2850 5650
+Wire Wire Line
+	2650 5300 2950 5300
+Wire Wire Line
+	2650 5850 2950 5850
+Text Notes 6200 4100 0    50   ~ 0
+* GPIO26 logic:\n  Open is high\n  Close is low
 $EndSCHEMATC
