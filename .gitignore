@@ -1,4 +1,7 @@
-<<<<<<< HEAD
+# My stuff #
+############
+twilio.conf
+
 # Compiled source #
 ###################
 *.com
@@ -53,4 +56,3 @@ RCS
 *.swp
 foo*
 id_rsa*
->>>>>>> poop/master
