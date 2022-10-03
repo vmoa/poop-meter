@@ -32,6 +32,7 @@ from time import sleep
 
 import arduino
 import device
+import globalvar
 import pager
 import valve
 
@@ -81,6 +82,9 @@ def initialize():
     # Initialize devices
     gpio = device.Gpio()
     logging.info(device.printStatus())
+
+    # Initialize pager
+    globalvar.Globalvar.pager = pager.Pager()
 
     return(args)
 
