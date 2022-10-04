@@ -7,7 +7,6 @@ import threading
 from time import sleep
 
 import device
-import globalvar
 import pager
 
 class Valve:
@@ -35,7 +34,7 @@ class Valve:
             return
 
         logging.info("{}ing valve (timeout in {} seconds)".format(action, self.timeout))
-        globalvar.Globalvar.pager.send('dave', 'PoopWatcher is {}ing the main water vavle'.format(action))
+        pager.Pager.send('PoopWatcher is {}ing the main water vavle'.format(action))
         if (action == 'Open'):
             device.Gpio.do_open_close.turnOff()  # Off == Open
             threading.Timer(self.timeout, self.when_open_timeout).start()

@@ -32,7 +32,6 @@ from time import sleep
 
 import arduino
 import device
-import globalvar
 import pager
 import valve
 
@@ -84,7 +83,8 @@ def initialize():
     logging.info(device.printStatus())
 
     # Initialize pager
-    globalvar.Globalvar.pager = pager.Pager()
+    mypager = pager.Pager()
+    mypager.set_default_recip('dave')
 
     return(args)
 
@@ -97,6 +97,7 @@ if __name__ == '__main__':
 
     if (args.test_mode):
         logging.info("Entering test mode")
+        pager.Pager.send('Test mode starting')
         valve = valve.Valve()
         while (1):
             valve.command('Open')
