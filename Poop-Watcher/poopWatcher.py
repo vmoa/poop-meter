@@ -14,6 +14,7 @@
 #   gpiozero (https://gpiozero.readthedocs.io/en/stable/) pip3 install gpiozero rpi.gpio
 #   pySerial (https://pyserial.readthedocs.io/en/latest/) pip3 install pyserial
 #   Twilio helper (https://www.twilio.com/docs/libraries/python) pip3 install twilio
+#   MCP library (https://github.com/adafruit/Adafruit_CircuitPython_MCP3xxx/) pip3 install adafruit-circuitpython-mcp3xxx
 #
 #  sudo apt-get install python3-pigpio
 
