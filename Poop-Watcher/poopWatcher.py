@@ -8,7 +8,7 @@
 # Requires I2C for updating status on the the Grove LCD
 #   raspi-config --> interfacing --> {spi,i2c}
 #
-# The running user must be a member of group 'gpio'
+# The running user must be a member of groups gpio and spi
 #
 # We also use:
 #   gpiozero (https://gpiozero.readthedocs.io/en/stable/) pip3 install gpiozero rpi.gpio
