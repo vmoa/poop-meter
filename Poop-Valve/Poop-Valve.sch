@@ -5,13 +5,13 @@ $Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title "Poop Valve Controller"
-Date ""
-Rev "0.5 (draft)"
+Date "2022-10-19"
+Rev "0.6 (draft)"
 Comp "Robert Ferguson Observatory"
-Comment1 "v0.5 add connectors"
-Comment2 "v0.4 fix override logic; detect override; resize"
-Comment3 "v0.3 pivot to manual override relay"
-Comment4 "v0.2 change relay configuration"
+Comment1 "v0.6 fix led connector pinout"
+Comment2 "v0.5 add connectors"
+Comment3 "v0.4 fix override logic; detect override; resize"
+Comment4 "v0.3 pivot to manual override relay"
 $EndDescr
 $Comp
 L Connector:Raspberry_Pi_2_3 J?
@@ -105,8 +105,8 @@ $Comp
 L Device:R R?
 U 1 1 632F805C
 P 4150 750
-F 0 "R?" V 4050 600 50  0000 C CNN
-F 1 "330" V 4250 750 50  0000 C CNN
+F 0 "R?" V 4050 750 50  0000 C CNN
+F 1 "330" V 4150 750 50  0000 C CNN
 F 2 "" V 4080 750 50  0001 C CNN
 F 3 "~" H 4150 750 50  0001 C CNN
 	1    4150 750 
@@ -116,8 +116,8 @@ $Comp
 L Device:R R?
 U 1 1 632F930A
 P 4150 950
-F 0 "R?" V 4350 950 50  0000 C CNN
-F 1 "330" V 4250 950 50  0000 C CNN
+F 0 "R?" V 4050 950 50  0000 C CNN
+F 1 "330" V 4150 950 50  0000 C CNN
 F 2 "" V 4080 950 50  0001 C CNN
 F 3 "~" H 4150 950 50  0001 C CNN
 	1    4150 950 
@@ -340,8 +340,8 @@ $Comp
 L Device:R R?
 U 1 1 63696CF2
 P 4950 1350
-F 0 "R?" V 4743 1350 50  0000 C CNN
-F 1 "1000" V 4834 1350 50  0000 C CNN
+F 0 "R?" V 4850 1350 50  0000 C CNN
+F 1 "1000" V 4950 1350 50  0000 C CNN
 F 2 "" V 4880 1350 50  0001 C CNN
 F 3 "~" H 4950 1350 50  0001 C CNN
 	1    4950 1350
@@ -351,8 +351,8 @@ $Comp
 L Device:R R?
 U 1 1 636976E4
 P 4950 1950
-F 0 "R?" V 4743 1950 50  0000 C CNN
-F 1 "1000" V 4834 1950 50  0000 C CNN
+F 0 "R?" V 4850 1950 50  0000 C CNN
+F 1 "1000" V 4950 1950 50  0000 C CNN
 F 2 "" V 4880 1950 50  0001 C CNN
 F 3 "~" H 4950 1950 50  0001 C CNN
 	1    4950 1950
@@ -606,8 +606,8 @@ $Comp
 L Device:R R?
 U 1 1 63562052
 P 4950 2800
-F 0 "R?" V 4743 2800 50  0000 C CNN
-F 1 "1000" V 4834 2800 50  0000 C CNN
+F 0 "R?" V 4850 2800 50  0000 C CNN
+F 1 "1000" V 4950 2800 50  0000 C CNN
 F 2 "" V 4880 2800 50  0001 C CNN
 F 3 "~" H 4950 2800 50  0001 C CNN
 	1    4950 2800
@@ -642,8 +642,8 @@ $Comp
 L Device:R R?
 U 1 1 6366E688
 P 4150 2500
-F 0 "R?" V 4350 2500 50  0000 C CNN
-F 1 "330" V 4250 2500 50  0000 C CNN
+F 0 "R?" V 4050 2500 50  0000 C CNN
+F 1 "330" V 4150 2500 50  0000 C CNN
 F 2 "" V 4080 2500 50  0001 C CNN
 F 3 "~" H 4150 2500 50  0001 C CNN
 	1    4150 2500
@@ -1126,17 +1126,6 @@ Wire Wire Line
 Wire Wire Line
 	1300 2800 3850 2800
 Connection ~ 1300 2950
-$Comp
-L Connector:Conn_01x06_Male J?
-U 1 1 64A6ADC2
-P 6600 950
-F 0 "J?" H 6650 450 50  0000 C CNN
-F 1 "LEDs" H 6650 550 50  0000 C CNN
-F 2 "" H 6600 950 50  0001 C CNN
-F 3 "~" H 6600 950 50  0001 C CNN
-	1    6600 950 
-	-1   0    0    -1  
-$EndComp
 Wire Wire Line
 	7300 750  7300 850 
 Wire Wire Line
@@ -1144,40 +1133,14 @@ Wire Wire Line
 Wire Wire Line
 	7300 1150 7300 1250
 Wire Wire Line
-	7000 750  6400 750 
-Connection ~ 6400 750 
-Wire Wire Line
-	6400 850  7300 850 
-Wire Wire Line
-	6400 950  7000 950 
-Wire Wire Line
-	6400 1050 7300 1050
-Wire Wire Line
-	6400 1150 7000 1150
-Wire Wire Line
-	6400 1250 7300 1250
-Connection ~ 6400 950 
-Wire Wire Line
 	4700 1550 4700 1050
 Wire Wire Line
-	4700 1050 6400 1050
-Connection ~ 6400 1050
-Wire Wire Line
-	6400 850  4700 850 
-Wire Wire Line
 	4700 850  4700 1050
-Connection ~ 6400 850 
 Connection ~ 4700 1050
 Wire Wire Line
 	6300 1350 6300 1250
 Wire Wire Line
-	6300 1250 6400 1250
-Connection ~ 6400 1250
-Wire Wire Line
-	6400 1150 6200 1150
-Wire Wire Line
 	6200 1150 6200 2500
-Connection ~ 6400 1150
 Wire Wire Line
 	3750 750  3750 1350
 Connection ~ 3750 1350
@@ -1192,10 +1155,6 @@ Wire Wire Line
 	3850 1550 3850 1950
 Wire Wire Line
 	3450 1550 3850 1550
-Wire Wire Line
-	4300 750  6400 750 
-Wire Wire Line
-	4300 950  6400 950 
 Wire Wire Line
 	3750 750  4000 750 
 Wire Wire Line
@@ -1259,4 +1218,45 @@ Text Notes 3750 5350 0    50   ~ 0
 +12V
 Text Notes 3100 1450 0    50   ~ 0
 pin
+$Comp
+L Connector:Conn_01x06_Male J?
+U 1 1 64A6ADC2
+P 6600 1050
+F 0 "J?" H 6600 650 50  0000 C CNN
+F 1 "LEDs" H 6650 1350 50  0000 C CNN
+F 2 "" H 6600 1050 50  0001 C CNN
+F 3 "~" H 6600 1050 50  0001 C CNN
+	1    6600 1050
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4300 750  6400 750 
+Wire Wire Line
+	4700 850  6400 850 
+Wire Wire Line
+	4300 950  6400 950 
+Wire Wire Line
+	4700 1050 6400 1050
+Wire Wire Line
+	6300 1250 6400 1250
+Connection ~ 6400 1050
+Wire Wire Line
+	6400 1050 7300 1050
+Connection ~ 6400 950 
+Wire Wire Line
+	6400 950  7000 950 
+Connection ~ 6400 850 
+Wire Wire Line
+	6400 850  7300 850 
+Connection ~ 6400 750 
+Wire Wire Line
+	6400 750  7000 750 
+Connection ~ 6400 1250
+Wire Wire Line
+	6400 1250 7300 1250
+Wire Wire Line
+	6200 1150 6400 1150
+Connection ~ 6400 1150
+Wire Wire Line
+	6400 1150 7000 1150
 $EndSCHEMATC
