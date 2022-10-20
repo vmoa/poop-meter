@@ -1,4 +1,8 @@
-<<<<<<< HEAD
+# My stuff #
+############
+twilio.conf
+__pycache__
+
 # Compiled source #
 ###################
 *.com
@@ -53,4 +57,3 @@ RCS
 *.swp
 foo*
 id_rsa*
->>>>>>> poop/master
