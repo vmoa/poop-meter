@@ -124,6 +124,15 @@ def beatHeart(output=0, step=0):
     else:
         logging.error("WTF? beatHeart() called with step %".format(step))
 
+def checkOverride():
+    if (Gpio.is_override.isOn()):
+        started = Gpio.is_override.started()
+        warned = Gpio.is_override.warned()
+        now = datetime.datetime.now().second
+        if (now > warned + OVERRIDE_WARN_SECS):
+            page("WARNING: manual override has been set for {} minutes; poop valve operation suspended".format((now - started)/60))
+            OVERRIDE_WARN_SECS = now
+
 
 def perSecond():
     """Callback that runs every second to perform housekeeping duties"""
@@ -131,5 +140,6 @@ def perSecond():
         beatHeart(Gpio.heart.device)
     if (int(datetime.datetime.now().second) % statusInterval == 0):
         logging.info('-- ' + printStatus())
+    checkOverride()
     threading.Timer(1.0, perSecond).start()  # Redispatch self
 
