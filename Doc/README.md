@@ -7,7 +7,7 @@ This folder contains documentation on the design and components used.
 
 ### Current Design (2022)
 
-[Poop\ Valve\ Controller\ Schematic.pdf](Poop Valve Controller Schematic.pdf):
+[Poop Valve Controller Schematic.pdf](<Poop Valve Controller Schematic.pdf>):
 Schematic of the New and Improved Raspberry Pi poop meter. Ki-Cad source is in the `Poop-Valve` folder.
 
 [Poop_Controller_Layout.pdf](Poop_Controller_Layout.pdf):
