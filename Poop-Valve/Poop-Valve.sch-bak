@@ -5,13 +5,13 @@ $Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title "Poop Valve Controller"
-Date ""
-Rev "0.5 (draft)"
+Date "2022-10-19"
+Rev "0.6 (draft)"
 Comp "Robert Ferguson Observatory"
-Comment1 "v0.5 add connectors"
-Comment2 "v0.4 fix override logic; detect override; resize"
-Comment3 "v0.3 pivot to manual override relay"
-Comment4 "v0.2 change relay configuration"
+Comment1 "v0.6 fix led connector pinout"
+Comment2 "v0.5 add connectors"
+Comment3 "v0.4 fix override logic; detect override; resize"
+Comment4 "v0.3 pivot to manual override relay"
 $EndDescr
 $Comp
 L Connector:Raspberry_Pi_2_3 J?
