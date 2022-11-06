@@ -48,6 +48,7 @@ def initialize():
     parser = argparse.ArgumentParser(description='RFO Poop Tank (septic) controller.')
     parser.add_argument('--debug', dest='debug', action='store_true', help='include DEBUG messages in logs')
     parser.add_argument('--test-mode', dest='test_mode', action='store_true', help='enter test mode')
+    parser.add_argument('--simulate', dest='simulate', action='store_true', help='simulate (do not send) pages')
     parser.add_argument('--log-file', '-L', dest='logfile', action='store', help='log filename (default {})'.format(default_logfile))
     args = parser.parse_args()
 
@@ -84,7 +85,7 @@ def initialize():
     logging.info(device.printStatus())
 
     # Initialize pager
-    mypager = pager.Pager()
+    mypager = pager.Pager(simulate = args.simulate)
     mypager.set_default_recip('dave')
 
     return(args)
