@@ -8,7 +8,11 @@ import logging
 import threading
 import time
 
+import pager
+
 statusInterval = 6     # Seconds between status updates without input changes
+overrideNotifySecs1 = 10     # Seconds before sending first page about manual override (5 minutes grace)
+overrideNotifySecs2 = 300    # Seconds between subsequent pages about manual override (daily)
 
 class Gpio:
 
@@ -37,10 +41,22 @@ class Gpio:
             self.device.when_activated = when_activated if (when_activated) else self.activated
             self.device.when_deactivated = when_deactivated if (when_deactivated) else self.deactivated
             logging.info('Initialize sensor {} (pull_up={})'.format(name, self.device.pull_up))
+            logging.debug('when_activated:{}, when_deactivated{}'.format(self.device.when_activated, self.device.when_deactivated))
             Gpio.Sensor.sensors.append(self)
             Gpio.Sensor.by_name[name] = self
             Gpio.Sensor.by_pin[pin] = self
             Gpio.Sensor.names.append(name)
+
+            # Initialize override timers
+            if (name == 'override'):
+                if (self.isOn()):
+                    logging.warning("Manual override is enabled; will notify in {} if still set".format(datetime.timedelta(seconds=overrideNotifySecs1)))
+                    now = time.time()
+                    self.activated_ts = now
+                    self.notify_ts = now + overrideNotifySecs1
+                else:
+                    self.activated_ts = -1
+                    self.notify_ts = -1
 
         def is_active(self):
             return(self.device.is_active)
@@ -53,10 +69,20 @@ class Gpio:
 
         # Default callbacks; override at instance creation or by setting <var>.device.when_[de]activated
         def activated(self):
-            logging.info('UP ' + self.name + ' ' + printStatus())
+            logging.info(printStatus() + ' HIGH:' + self.name)
+            if (self.name == 'override'):
+                logging.warning("Manual override is enabled; will notify in {} if still set".format(datetime.timedelta(seconds=overrideNotifySecs1)))
+                now = time.time()
+                self.activated_ts = now
+                self.notify_ts = now + overrideNotifySecs1
 
         def deactivated(self):
-            logging.info('DN ' + self.name + ' ' + printStatus())
+            logging.info(printStatus() + ' LOW:' + self.name)
+            if (self.name == 'override'):
+                logging.warning("Manual override cleared")
+                checkOverride()
+                self.activated_ts = -1
+                self.notify_ts = -1
 
 
     class Control:
@@ -78,11 +104,11 @@ class Gpio:
 
         def turnOn(self):
             self.device.on()
-            logging.info('ON ' + printStatus())
+            logging.info(printStatus() + ' ON:' + self.name)
 
         def turnOff(self):
             self.device.off()
-            logging.info('OF ' + printStatus())
+            logging.info(printStatus() + ' OFF:' + self.name)
 
         def is_active(self):
             return(self.device.value == 1)
@@ -125,21 +151,30 @@ def beatHeart(output=0, step=0):
         logging.error("WTF? beatHeart() called with step %".format(step))
 
 def checkOverride():
+    """Check if manual override is set and notify at regular intervals."""
     if (Gpio.is_override.isOn()):
-        started = Gpio.is_override.started()
-        warned = Gpio.is_override.warned()
-        now = datetime.datetime.now().second
-        if (now > warned + OVERRIDE_WARN_SECS):
-            page("WARNING: manual override has been set for {} minutes; poop valve operation suspended".format((now - started)/60))
-            OVERRIDE_WARN_SECS = now
+        now = time.time()
+        # print("{} > {}".format(int(now), int(Gpio.is_override.notify_ts)))
+        if (Gpio.is_override.notify_ts > 0 and now > Gpio.is_override.notify_ts):
+            pager.Pager.send("WARNING: manual override has been enabled for {}; poop valve operation suspended"
+                       .format(datetime.timedelta(seconds=int(now-Gpio.is_override.activated_ts))))
+            Gpio.is_override.notify_ts = now + overrideNotifySecs2
+    else:
+        if (Gpio.is_override.notify_ts > 0):
+            now = time.time()
+            pager.Pager.send("INFO: manual override disabled after {}"
+                       .format(datetime.timedelta(seconds=int(now-Gpio.is_override.activated_ts))))
+            Gpio.is_override.notify_ts = -1
+            Gpio.is_override.activated_ts = -1
 
 
 def perSecond():
     """Callback that runs every second to perform housekeeping duties"""
-    if (int(datetime.datetime.now().second) % 2 == 0):
+    now = int(time.time())
+    if (now % 2 == 0):
         beatHeart(Gpio.heart.device)
-    if (int(datetime.datetime.now().second) % statusInterval == 0):
-        logging.info('-- ' + printStatus())
+    if (now % statusInterval == 0):
+        logging.info(printStatus())
     checkOverride()
     threading.Timer(1.0, perSecond).start()  # Redispatch self
 
