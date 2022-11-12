@@ -61,3 +61,8 @@ class Pager:
                 logging.error('Pager.send(): recipient {} unknown'.format(recip))
         else:
             logging.error('Pager.send(): cannot send to {}: no Twilio config found'.format(recip))
+
+    @classmethod
+    def notify(cls, msg, varags, recip=None):
+        """Format and send standard message according to defined schedule."""
+        pass
