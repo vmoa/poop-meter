@@ -9,6 +9,7 @@ import threading
 import time
 
 import pager
+import adc
 
 statusInterval = 6     # Seconds between status updates without input changes
 overrideNotifySecs1 = 10     # Seconds before sending first page about manual override (5 minutes grace)
@@ -25,6 +26,8 @@ class Gpio:
         Gpio.do_enable = self.Control(pin=25, name='enable')
         Gpio.do_open_close = self.Control(pin=26, name='open_close')
         Gpio.heart = self.Control(pin=27, name='heart')    # heartLed
+
+        Gpio.adc = adc.Adc()
 
 
     class Sensor:
@@ -121,8 +124,14 @@ class Gpio:
 
 
 def printStatus():
+    """Return a string with the formatted status."""
     status = ''
     ### print(util.timestamp(), threading.get_ident(), end=' ')
+    print(Gpio.adc)
+    poopLevel = Gpio.adc.get_value()
+    poopVolts = Gpio.adc.get_voltage()
+    poopPercent = Gpio.adc.get_percent()
+    status += "POOP:{}%-{}-{}v ".format(poopPercent, poopLevel, poopVolts)
     for sensor in Gpio.Sensor.sensors:
         if (sensor.is_active()):
             status += "[{}] ".format(sensor.name.upper())
@@ -168,10 +177,20 @@ def checkOverride():
             Gpio.is_override.activated_ts = -1
 
 
+def samplePoop():
+    """Read the ADC and Do The Right Thing(tm) with respect to poop level."""
+    # Should this live in adc.py?
+    pass
+
+
+sampleInterval = 1  # Rate at which we sample poop level
+
 def perSecond():
     """Callback that runs every second to perform housekeeping duties"""
     now = int(time.time())
-    if (now % 2 == 0):
+    if (int(datetime.datetime.now().second) % sampleInterval == 0):
+        samplePoop()
+    if (int(datetime.datetime.now().second) % 2 == 0):
         beatHeart(Gpio.heart.device)
     if (now % statusInterval == 0):
         logging.info(printStatus())
