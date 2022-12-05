@@ -18,6 +18,9 @@ class Grove:
     LINE0 = 0x80
     LINE1 = 0xC0
 
+    # To toggle updatePoop() between volts and abs value
+    toggle = False
+
     def __init(self, version='v?'):
         self.sendCommand(0x08 | 0x04)    # display on, no cursor
         self.sendCommand(0x28)           # 2 lines
@@ -109,6 +112,19 @@ class Grove:
         for c in text:
             self.printChar(c)
             #self.bus.write_byte_data(self.DISPLAY_TEXT_ADDR, 0x40, ord(c))
+
+    #
+    # Above here is pretty generica stuff; the rest is Poop Meter specific
+    #
+
+    @classmethod
+    def updatePoop(self, poopPercent, poopLevel, poopVolts):
+        """Update the poop level display on line 1."""
+        if (self.toggle == False):
+            self.printLine("{}% ({}a)".format(poopPercent, poopLevel), line=1)
+        else:
+            self.printLine("{}% ({}v)".format(poopPercent, poopVolts), line=1)
+        self.toggle = not(self.toggle)
 
 # Unit test
 if (__name__ == "__main__"):

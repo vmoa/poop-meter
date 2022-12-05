@@ -88,7 +88,7 @@ def initialize():
     # Initialize the Grove LCD
     lcd = grove.Grove()
     lcd.setRGB(0, 255, 255)  # cyan
-    lcd.setText("RFO Poop Meter\n {}".format(version))
+    lcd.setText("RFO Poop Meter\nVersion {}".format(version))
     sleep(2)  # This should be an LCD freeze display option intead of a sleep
 
     # Initialize devices

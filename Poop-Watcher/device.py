@@ -16,8 +16,6 @@ statusInterval = 6     # Seconds between status updates without input changes
 overrideNotifySecs1 = 10     # Seconds before sending first page about manual override (5 minutes grace)
 overrideNotifySecs2 = 300    # Seconds between subsequent pages about manual override (daily)
 
-toggle=False           # To swap between abs and volts display
-
 class Gpio:
 
     def __init__(self):
@@ -133,15 +131,7 @@ def printStatus():
     poopVolts = Gpio.adc.get_voltage()
     poopPercent = Gpio.adc.get_percent()
     status += "POOP:{}%-{}-{}v ".format(poopPercent, poopLevel, poopVolts)
-
-    try:
-        printStatus.toggle
-    except AttributeError:
-        printStatus.toggle = False
-    printStatus.toggle = not(printStatus.toggle)
-    print("DEBUG: ", printStatus.toggle)
-    grove.Grove.selectLine(1)
-    grove.Grove.printLine("{}% ({}a)".format(poopPercent, poopLevel) if (printStatus.toggle == False) else "{}% ({}v)".format(poopPercent, poopVolts))
+    grove.Grove.updatePoop(poopPercent, poopLevel, poopVolts)
 
     for sensor in Gpio.Sensor.sensors:
         if (sensor.is_active()):
