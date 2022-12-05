@@ -5,7 +5,7 @@
 #   Once we get corellation between Arduino and SPI data we switch to SPI and retire Arduino
 #
 # Requires SPI for reading from the MCP3009 analog/digital converter
-# Requires I2C for updating status on the the Grove LCD
+# Requires I2C for updating status on the the Grove LCD (https://wiki.seeedstudio.com/Grove-LCD_RGB_Backlight/)
 #   raspi-config --> interfacing --> {spi,i2c}
 #
 # The running user must be a member of groups gpio and spi
@@ -15,8 +15,12 @@
 #   pySerial (https://pyserial.readthedocs.io/en/latest/) pip3 install pyserial
 #   Twilio helper (https://www.twilio.com/docs/libraries/python) pip3 install twilio
 #   MCP library (https://github.com/adafruit/Adafruit_CircuitPython_MCP3xxx/) pip3 install adafruit-circuitpython-mcp3xxx
+#   i2c smbus bindings (https://pypi.org/project/smbus/) pip3 install smbus
 #
 #  sudo apt-get install python3-pigpio
+#
+# Set port permissions
+#   sudo chmod 666  /dev/i2c-1
 
 import argparse
 import datetime
@@ -33,6 +37,7 @@ from time import sleep
 
 import arduino
 import device
+import grove
 import pager
 import valve
 
@@ -79,6 +84,12 @@ def initialize():
         loggingConfig['filename'] = args.logfile if args.logfile else default_logfile;
     logging.basicConfig(**loggingConfig)
     logging.info("Initializing poopWatcher {}".format(version))
+
+    # Initialize the Grove LCD
+    lcd = grove.Grove()
+    lcd.setRGB(0, 255, 255)  # cyan
+    lcd.setText("RFO Poop Meter\n {}".format(version))
+    sleep(2)  # This should be an LCD freeze display option intead of a sleep
 
     # Initialize devices
     gpio = device.Gpio()

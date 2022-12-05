@@ -8,12 +8,15 @@ import logging
 import threading
 import time
 
-import pager
 import adc
+import grove
+import pager
 
 statusInterval = 6     # Seconds between status updates without input changes
 overrideNotifySecs1 = 10     # Seconds before sending first page about manual override (5 minutes grace)
 overrideNotifySecs2 = 300    # Seconds between subsequent pages about manual override (daily)
+
+toggle=False           # To swap between abs and volts display
 
 class Gpio:
 
@@ -122,16 +125,24 @@ class Gpio:
         def isOff(self):
             return(self.device.value == 0)
 
-
 def printStatus():
     """Return a string with the formatted status."""
     status = ''
     ### print(util.timestamp(), threading.get_ident(), end=' ')
-    print(Gpio.adc)
     poopLevel = Gpio.adc.get_value()
     poopVolts = Gpio.adc.get_voltage()
     poopPercent = Gpio.adc.get_percent()
     status += "POOP:{}%-{}-{}v ".format(poopPercent, poopLevel, poopVolts)
+
+    try:
+        printStatus.toggle
+    except AttributeError:
+        printStatus.toggle = False
+    printStatus.toggle = not(printStatus.toggle)
+    print("DEBUG: ", printStatus.toggle)
+    grove.Grove.selectLine(1)
+    grove.Grove.printLine("{}% ({}a)".format(poopPercent, poopLevel) if (printStatus.toggle == False) else "{}% ({}v)".format(poopPercent, poopVolts))
+
     for sensor in Gpio.Sensor.sensors:
         if (sensor.is_active()):
             status += "[{}] ".format(sensor.name.upper())
@@ -147,6 +158,8 @@ def printStatus():
 def beatHeart(output=0, step=0):
     if (step == 0):
         output.on()
+        grove.Grove.setCursor(1,15)
+        grove.Grove.printChar('*')
         threading.Timer(0.1, beatHeart, [output,1]).start()
     elif (step == 1):
         output.off()
@@ -156,6 +169,8 @@ def beatHeart(output=0, step=0):
         threading.Timer(0.1, beatHeart, [output,3]).start()
     elif (step == 3):
         output.off()
+        grove.Grove.setCursor(1,15)
+        grove.Grove.printChar(' ')
     else:
         logging.error("WTF? beatHeart() called with step %".format(step))
 
