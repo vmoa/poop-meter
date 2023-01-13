@@ -5,13 +5,13 @@ $Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title "Poop Valve Controller"
-Date "2022-10-19"
-Rev "0.6 (draft)"
+Date "2023-01-12"
+Rev "0.7 (draft)"
 Comp "Robert Ferguson Observatory"
-Comment1 "v0.6 fix led connector pinout"
+Comment1 "v0.4 fix override logic; detect override; resize"
 Comment2 "v0.5 add connectors"
-Comment3 "v0.4 fix override logic; detect override; resize"
-Comment4 "v0.3 pivot to manual override relay"
+Comment3 "v0.6 fix led connector pinout"
+Comment4 "v0.7 correct ADC sample wiring"
 $EndDescr
 $Comp
 L Connector:Raspberry_Pi_2_3 J?
@@ -49,12 +49,12 @@ $EndComp
 $Comp
 L Device:Battery BT?
 U 1 1 632C7943
-P 1500 6600
-F 0 "BT?" H 1500 6200 50  0000 C CNN
-F 1 "12V" H 1500 6300 50  0000 C CNN
-F 2 "" V 1500 6660 50  0001 C CNN
-F 3 "~" V 1500 6660 50  0001 C CNN
-	1    1500 6600
+P 1300 7550
+F 0 "BT?" H 1300 7150 50  0000 C CNN
+F 1 "12V" H 1300 7250 50  0000 C CNN
+F 2 "" V 1300 7610 50  0001 C CNN
+F 3 "~" V 1300 7610 50  0001 C CNN
+	1    1300 7550
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -93,12 +93,12 @@ $EndComp
 $Comp
 L Connector:Conn_Coaxial_Power J?
 U 1 1 632E443C
-P 950 6550
-F 0 "J?" H 950 6100 50  0000 C CNN
-F 1 "Charger" H 950 6200 50  0000 C CNN
-F 2 "" H 950 6500 50  0001 C CNN
-F 3 "~" H 950 6500 50  0001 C CNN
-	1    950  6550
+P 750 7500
+F 0 "J?" H 750 7050 50  0000 C CNN
+F 1 "Charger" H 750 7150 50  0000 C CNN
+F 2 "" H 750 7450 50  0001 C CNN
+F 3 "~" H 750 7450 50  0001 C CNN
+	1    750  7500
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -285,17 +285,6 @@ F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/21295d.pdf" H 9150 5300 50 
 	0    1    -1   0   
 $EndComp
 $Comp
-L Connector:Conn_01x02_Male J?
-U 1 1 6362E2EC
-P 10300 5950
-F 0 "J?" H 10350 6100 50  0000 R CNN
-F 1 "V Sample" H 10600 5750 50  0000 R CNN
-F 2 "" H 10300 5950 50  0001 C CNN
-F 3 "~" H 10300 5950 50  0001 C CNN
-	1    10300 5950
-	-1   0    0    -1  
-$EndComp
-$Comp
 L Connector:Conn_01x04_Male J?
 U 1 1 6367843A
 P 10300 2400
@@ -392,26 +381,26 @@ Enable
 $Comp
 L Device:Fuse_Small F?
 U 1 1 63320CD5
-P 2350 6400
-F 0 "F?" H 2350 6585 50  0000 C CNN
-F 1 "1A" H 2350 6494 50  0000 C CNN
-F 2 "" H 2350 6400 50  0001 C CNN
-F 3 "~" H 2350 6400 50  0001 C CNN
-	1    2350 6400
+P 2150 6400
+F 0 "F?" H 2150 6585 50  0000 C CNN
+F 1 "1A" H 2150 6494 50  0000 C CNN
+F 2 "" H 2150 6400 50  0001 C CNN
+F 3 "~" H 2150 6400 50  0001 C CNN
+	1    2150 6400
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	950  6450 950  6400
+	750  7400 750  7350
 Wire Wire Line
-	950  6400 1500 6400
-Connection ~ 1500 6400
+	750  7350 1300 7350
+Connection ~ 1300 7350
 Wire Wire Line
-	950  6750 950  6800
+	750  7700 750  7750
 Wire Wire Line
-	950  6800 1500 6800
+	750  7750 1300 7750
 Wire Wire Line
-	1500 6800 1950 6800
-Connection ~ 1500 6800
+	1300 7750 1750 7750
+Connection ~ 1300 7750
 Text Notes 6300 3700 0    50   ~ 0
 * Open-Close
 $Comp
@@ -567,7 +556,7 @@ Wire Wire Line
 	3850 5550 4250 5550
 Wire Wire Line
 	3850 5750 4250 5750
-Text Notes 6200 4100 0    50   ~ 0
+Text Notes 6150 4000 0    50   ~ 0
 * GPIO26 logic:\n  Open is high\n  Close is low
 Wire Wire Line
 	1500 2250 3300 2250
@@ -682,12 +671,6 @@ Wire Wire Line
 Wire Wire Line
 	9700 5300 9550 5300
 Connection ~ 9700 5000
-Wire Wire Line
-	9350 5800 9350 5950
-Wire Wire Line
-	8400 6050 8400 5300
-Wire Wire Line
-	8400 5300 8450 5300
 $Comp
 L power:+12V #PWR?
 U 1 1 637B1DA1
@@ -719,10 +702,6 @@ Wire Wire Line
 	8450 3600 9150 3600
 Wire Wire Line
 	9150 3600 9150 4600
-Wire Wire Line
-	9350 5950 10100 5950
-Wire Wire Line
-	8400 6050 10100 6050
 Connection ~ 3850 2800
 Wire Wire Line
 	3850 2800 4800 2800
@@ -829,31 +808,31 @@ Wire Wire Line
 $Comp
 L Connector:Conn_Coaxial_Power J?
 U 1 1 63C43814
-P 2200 6550
-F 0 "J?" H 2200 6050 50  0000 C CNN
-F 1 "12VDC" H 2200 6150 50  0000 C CNN
-F 2 "" H 2200 6500 50  0001 C CNN
-F 3 "~" H 2200 6500 50  0001 C CNN
-	1    2200 6550
+P 1900 6550
+F 0 "J?" H 1650 6500 50  0000 C CNN
+F 1 "12VDC" H 1650 6400 50  0000 C CNN
+F 2 "" H 1900 6500 50  0001 C CNN
+F 3 "~" H 1900 6500 50  0001 C CNN
+	1    1900 6550
 	1    0    0    -1  
 $EndComp
 $Comp
 L Connector:Conn_Coaxial_Power J?
 U 1 1 63C5326A
-P 1950 6550
-F 0 "J?" V 2175 6500 50  0000 C CNN
-F 1 "Power" H 1900 6150 50  0000 C CNN
-F 2 "" H 1950 6500 50  0001 C CNN
-F 3 "~" H 1950 6500 50  0001 C CNN
-	1    1950 6550
+P 1750 7500
+F 0 "J?" V 1975 7450 50  0000 C CNN
+F 1 "Power" H 1700 7100 50  0000 C CNN
+F 2 "" H 1750 7450 50  0001 C CNN
+F 3 "~" H 1750 7450 50  0001 C CNN
+	1    1750 7500
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	1950 6400 1950 6450
+	1750 7350 1750 7400
 Wire Wire Line
-	1500 6400 1950 6400
+	1300 7350 1750 7350
 Wire Wire Line
-	1950 6800 1950 6750
+	1750 7750 1750 7700
 $Comp
 L Connector:Conn_01x02_Male J?
 U 1 1 63C8A8CE
@@ -888,11 +867,9 @@ F 3 "~" H 3650 6550 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	2200 6800 2200 6750
+	1900 6800 1900 6750
 Wire Wire Line
-	2200 6450 2200 6400
-Wire Wire Line
-	2200 6400 2250 6400
+	1900 6450 1900 6400
 Wire Wire Line
 	3850 5750 3850 6650
 Connection ~ 3850 5750
@@ -907,15 +884,10 @@ Connection ~ 3450 6550
 Wire Wire Line
 	3850 5550 3850 5750
 Wire Wire Line
-	2450 6400 2500 6400
-Wire Wire Line
-	2200 6800 2500 6800
-Wire Wire Line
 	2500 6400 2500 6550
 Connection ~ 2500 6400
 Wire Wire Line
 	2500 6650 2500 6800
-Connection ~ 2500 6800
 Wire Wire Line
 	3000 6550 3250 6550
 Wire Wire Line
@@ -1241,7 +1213,7 @@ L Connector:Conn_01x05_Male J?
 U 1 1 636591C4
 P 850 3100
 F 0 "J?" V 912 2812 50  0000 R CNN
-F 1 "Ovr Sw" V 1003 2812 50  0000 R CNN
+F 1 "Ovr Switch" V 1003 2812 50  0000 R CNN
 F 2 "" H 850 3100 50  0001 C CNN
 F 3 "~" H 850 3100 50  0001 C CNN
 	1    850  3100
@@ -1282,11 +1254,127 @@ Wire Wire Line
 Connection ~ 1050 3300
 NoConn ~ 950  3300
 Text Notes 1150 3400 0    50   ~ 0
-Inline
+Inline (F)
 Wire Wire Line
 	1050 2900 1750 2900
 Wire Wire Line
 	1050 2900 1050 3300
 Wire Wire Line
 	1750 2900 1750 4000
+$Comp
+L Device:LED D?
+U 1 1 63AE6C12
+P 6800 4200
+F 0 "D?" V 6850 4400 50  0000 R CNN
+F 1 "Heart" V 6750 4500 50  0000 R CNN
+F 2 "" H 6800 4200 50  0001 C CNN
+F 3 "~" H 6800 4200 50  0001 C CNN
+	1    6800 4200
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 63B22253
+P 6800 4500
+F 0 "R?" H 6650 4550 50  0000 L CNN
+F 1 "470" V 6800 4450 50  0000 L CNN
+F 2 "" V 6730 4500 50  0001 C CNN
+F 3 "~" H 6800 4500 50  0001 C CNN
+	1    6800 4500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6800 3800 6850 3800
+$Comp
+L power:GND #PWR?
+U 1 1 63B37882
+P 6800 4650
+F 0 "#PWR?" H 6800 4400 50  0001 C CNN
+F 1 "GND" H 6805 4477 50  0000 C CNN
+F 2 "" H 6800 4650 50  0001 C CNN
+F 3 "" H 6800 4650 50  0001 C CNN
+	1    6800 4650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6800 4050 6800 3800
+$Comp
+L Device:R R?
+U 1 1 63D72259
+P 8950 6150
+F 0 "R?" V 9050 6100 50  0000 L CNN
+F 1 "500/2W" V 8850 6000 50  0000 L CNN
+F 2 "" V 8880 6150 50  0001 C CNN
+F 3 "~" H 8950 6150 50  0001 C CNN
+	1    8950 6150
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:Conn_Coaxial_Power J?
+U 1 1 641727E8
+P 9750 6450
+F 0 "J?" H 9950 6400 50  0000 C CNN
+F 1 "Sensor" H 9950 6500 50  0000 C CNN
+F 2 "" H 9750 6400 50  0001 C CNN
+F 3 "~" H 9750 6400 50  0001 C CNN
+	1    9750 6450
+	1    0    0    1   
+$EndComp
+$Comp
+L Connector:Conn_Coaxial_Power J?
+U 1 1 641859E8
+P 8250 6450
+F 0 "J?" H 8050 6400 50  0000 C CNN
+F 1 "24VDC" H 8050 6500 50  0000 C CNN
+F 2 "" H 8250 6400 50  0001 C CNN
+F 3 "~" H 8250 6400 50  0001 C CNN
+	1    8250 6450
+	1    0    0    1   
+$EndComp
+$Comp
+L Device:Fuse_Small F?
+U 1 1 642381A4
+P 8950 6550
+F 0 "F?" H 8950 6450 50  0000 C CNN
+F 1 "1A" H 8950 6644 50  0000 C CNN
+F 2 "" H 8950 6550 50  0001 C CNN
+F 3 "~" H 8950 6550 50  0001 C CNN
+	1    8950 6550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8250 6250 8250 6150
+Wire Wire Line
+	8250 5300 8450 5300
+Wire Wire Line
+	8800 6150 8250 6150
+Connection ~ 8250 6150
+Wire Wire Line
+	8250 6150 8250 5300
+Wire Wire Line
+	9750 6250 9750 6150
+Wire Wire Line
+	9750 6150 9350 6150
+Wire Wire Line
+	9350 5800 9350 6150
+Connection ~ 9350 6150
+Wire Wire Line
+	9350 6150 9100 6150
+Wire Wire Line
+	8250 6550 8850 6550
+Wire Wire Line
+	9050 6550 9750 6550
+Wire Wire Line
+	1900 6800 2500 6800
+Connection ~ 2500 6800
+Wire Wire Line
+	1900 6400 2050 6400
+Wire Wire Line
+	2250 6400 2500 6400
+Text Notes 8300 6350 0    50   ~ 0
+Phono
+Text Notes 9400 6350 0    50   ~ 0
+Phono
+Text Notes 1950 6700 0    50   ~ 0
+5.5x2.1
 $EndSCHEMATC

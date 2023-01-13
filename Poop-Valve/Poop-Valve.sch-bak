@@ -733,7 +733,7 @@ L Switch:SW_SPDT SW?
 U 1 1 6361BA9E
 P 1200 4400
 F 0 "SW?" H 1000 4200 50  0001 C CNN
-F 1 "Manual Override" H 1250 5000 50  0000 C CNN
+F 1 "Manual Override" H 1400 4200 50  0000 C CNN
 F 2 "" H 1200 4400 50  0001 C CNN
 F 3 "~" H 1200 4400 50  0001 C CNN
 	1    1200 4400
@@ -743,7 +743,7 @@ $Comp
 L Switch:SW_SPDT SW?
 U 1 1 63AD73BF
 P 1200 4000
-F 0 "SW?" H 1050 4100 50  0000 C CNN
+F 0 "SW?" H 1400 4200 50  0000 C CNN
 F 1 "SW_DPDT_x2" H 1550 3950 50  0001 C CNN
 F 2 "" H 1200 4000 50  0001 C CNN
 F 3 "~" H 1200 4000 50  0001 C CNN
@@ -762,8 +762,6 @@ Wire Wire Line
 	750  4100 750  4300
 Wire Wire Line
 	1000 4500 650  4500
-Wire Wire Line
-	1400 4000 1550 4000
 Wire Notes Line
 	1200 3950 1200 4350
 $Comp
@@ -1003,11 +1001,10 @@ Wire Wire Line
 	1750 4000 1750 4400
 Wire Wire Line
 	1750 4000 2000 4000
-Connection ~ 1750 4400
 Wire Wire Line
 	1750 4400 2000 4400
 Wire Wire Line
-	1400 4400 1750 4400
+	1400 4400 1500 4400
 $Comp
 L Switch:SW_SPDT_MSM SW?
 U 1 1 6402D89B
@@ -1026,36 +1023,25 @@ Open
 $Comp
 L power:GND #PWR?
 U 1 1 64417A2C
-P 900 2750
-F 0 "#PWR?" H 900 2500 50  0001 C CNN
-F 1 "GND" H 905 2577 50  0000 C CNN
-F 2 "" H 900 2750 50  0001 C CNN
-F 3 "" H 900 2750 50  0001 C CNN
-	1    900  2750
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:+3.3V #PWR?
-U 1 1 64418208
-P 1200 2750
-F 0 "#PWR?" H 1200 2600 50  0001 C CNN
-F 1 "+3.3V" H 1215 2923 50  0000 C CNN
-F 2 "" H 1200 2750 50  0001 C CNN
-F 3 "" H 1200 2750 50  0001 C CNN
-	1    1200 2750
+P 2200 2850
+F 0 "#PWR?" H 2200 2600 50  0001 C CNN
+F 1 "GND" H 2205 2677 50  0000 C CNN
+F 2 "" H 2200 2850 50  0001 C CNN
+F 3 "" H 2200 2850 50  0001 C CNN
+	1    2200 2850
 	1    0    0    -1  
 $EndComp
 NoConn ~ 2750 1950
 $Comp
 L Connector:Conn_01x03_Male J?
 U 1 1 645F382F
-P 1200 3150
-F 0 "J?" V 1354 2962 50  0000 R CNN
-F 1 "Override" V 1263 2962 50  0000 R CNN
-F 2 "" H 1200 3150 50  0001 C CNN
-F 3 "~" H 1200 3150 50  0001 C CNN
-	1    1200 3150
-	0    -1   -1   0   
+P 1800 2700
+F 0 "J?" H 2000 2500 50  0000 R CNN
+F 1 "Override" H 1950 2950 50  0000 R CNN
+F 2 "" H 1800 2700 50  0001 C CNN
+F 3 "~" H 1800 2700 50  0001 C CNN
+	1    1800 2700
+	1    0    0    -1  
 $EndComp
 $Comp
 L Connector:Conn_01x03_Male J?
@@ -1091,41 +1077,8 @@ Wire Wire Line
 	3200 4000 3200 2350
 Wire Wire Line
 	3300 4400 3300 2250
-Wire Wire Line
-	750  4100 750  3600
-Wire Wire Line
-	750  3600 1200 3600
-Wire Wire Line
-	1200 3600 1200 2950
 Connection ~ 750  4100
-Wire Wire Line
-	1200 2950 1200 2750
-Connection ~ 1200 2950
-Wire Wire Line
-	650  3900 650  3500
-Wire Wire Line
-	650  3500 1100 3500
-Wire Wire Line
-	1100 3500 1100 2950
 Connection ~ 650  3900
-Wire Wire Line
-	1100 2700 900  2700
-Wire Wire Line
-	900  2700 900  2750
-Wire Wire Line
-	1100 2700 1100 2950
-Connection ~ 1100 2950
-Wire Wire Line
-	1300 2950 1300 3500
-Wire Wire Line
-	1300 3500 1550 3500
-Wire Wire Line
-	1550 3500 1550 4000
-Wire Wire Line
-	1300 2800 1300 2950
-Wire Wire Line
-	1300 2800 3850 2800
-Connection ~ 1300 2950
 Wire Wire Line
 	7300 750  7300 850 
 Wire Wire Line
@@ -1259,4 +1212,81 @@ Wire Wire Line
 Connection ~ 6400 1150
 Wire Wire Line
 	6400 1150 7000 1150
+Connection ~ 2000 2800
+Wire Wire Line
+	2000 2800 3850 2800
+Connection ~ 2000 2700
+Connection ~ 2000 2600
+$Comp
+L power:+3.3V #PWR?
+U 1 1 64418208
+P 2300 2700
+F 0 "#PWR?" H 2300 2550 50  0001 C CNN
+F 1 "+3.3V" H 2315 2873 50  0000 C CNN
+F 2 "" H 2300 2700 50  0001 C CNN
+F 3 "" H 2300 2700 50  0001 C CNN
+	1    2300 2700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2000 2700 2300 2700
+Wire Wire Line
+	2200 2850 2200 2600
+Wire Wire Line
+	2100 2600 2000 2600
+Wire Wire Line
+	2000 2600 2200 2600
+$Comp
+L Connector:Conn_01x05_Male J?
+U 1 1 636591C4
+P 850 3100
+F 0 "J?" V 912 2812 50  0000 R CNN
+F 1 "Ovr Sw" V 1003 2812 50  0000 R CNN
+F 2 "" H 850 3100 50  0001 C CNN
+F 3 "~" H 850 3100 50  0001 C CNN
+	1    850  3100
+	0    -1   1    0   
+$EndComp
+Connection ~ 1750 4000
+Wire Wire Line
+	650  2600 650  3300
+Wire Wire Line
+	650  2600 2000 2600
+Connection ~ 650  3300
+Wire Wire Line
+	650  3300 650  3900
+Wire Wire Line
+	750  2700 750  3300
+Wire Wire Line
+	750  2700 2000 2700
+Connection ~ 750  3300
+Wire Wire Line
+	850  2800 850  3300
+Wire Wire Line
+	850  2800 2000 2800
+Wire Wire Line
+	750  3300 750  4100
+Connection ~ 850  3300
+Wire Wire Line
+	1400 4000 1400 3700
+Wire Wire Line
+	850  3700 1400 3700
+Wire Wire Line
+	850  3300 850  3700
+Wire Wire Line
+	1050 3300 1050 3600
+Wire Wire Line
+	1050 3600 1500 3600
+Wire Wire Line
+	1500 3600 1500 4400
+Connection ~ 1050 3300
+NoConn ~ 950  3300
+Text Notes 1150 3400 0    50   ~ 0
+Inline
+Wire Wire Line
+	1050 2900 1750 2900
+Wire Wire Line
+	1050 2900 1050 3300
+Wire Wire Line
+	1750 2900 1750 4000
 $EndSCHEMATC
