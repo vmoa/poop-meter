@@ -5,13 +5,13 @@ $Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 2
 Title "Poop Valve Controller"
-Date "2023-01-29"
-Rev "0.9 (draft)"
+Date "2023-02-01"
+Rev "0.10 (draft)"
 Comp "Robert Ferguson Observatory"
-Comment1 "v0.6 fix led connector pinout"
-Comment2 "v0.7 correct ADC sample wiring"
-Comment3 "v0.8 reconfigure manual override; updated layout for clarity"
-Comment4 "v0.9 add override shunt and sense transistors "
+Comment1 "v0.7 correct ADC sample wiring"
+Comment2 "v0.8 reconfigure manual override; updated layout for clarity"
+Comment3 "v0.9 add override shunt and sense transistors "
+Comment4 "v0.10 add Master Override switch"
 $EndDescr
 $Comp
 L Connector:Raspberry_Pi_2_3 J1
@@ -1256,17 +1256,6 @@ Wire Wire Line
 	4700 2500 4700 2800
 Wire Wire Line
 	4700 2500 4800 2500
-$Comp
-L power:GND #PWR012
-U 1 1 65D19661
-P 5050 4300
-F 0 "#PWR012" H 5050 4050 50  0001 C CNN
-F 1 "GND" H 5055 4127 50  0000 C CNN
-F 2 "" H 5050 4300 50  0001 C CNN
-F 3 "" H 5050 4300 50  0001 C CNN
-	1    5050 4300
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	4950 3900 5200 3900
 $Sheet
@@ -1335,14 +1324,14 @@ Wire Wire Line
 $Comp
 L Device:Q_NPN_CBE Q?
 U 1 1 6627A4F5
-P 5300 6250
+P 5350 6250
 AR Path="/65DFE627/6627A4F5" Ref="Q?"  Part="1" 
 AR Path="/6627A4F5" Ref="Q1"  Part="1" 
-F 0 "Q1" H 5490 6296 50  0000 L CNN
-F 1 "2N2222" H 5490 6205 50  0000 L CNN
-F 2 "" H 5500 6350 50  0001 C CNN
-F 3 "~" H 5300 6250 50  0001 C CNN
-	1    5300 6250
+F 0 "Q1" H 5540 6296 50  0000 L CNN
+F 1 "2N2222" H 5540 6205 50  0000 L CNN
+F 2 "" H 5550 6350 50  0001 C CNN
+F 3 "~" H 5350 6250 50  0001 C CNN
+	1    5350 6250
 	-1   0    0    -1  
 $EndComp
 $Comp
@@ -1361,14 +1350,14 @@ $EndComp
 $Comp
 L power:GND #PWR?
 U 1 1 6627A53E
-P 5200 6450
+P 5250 6450
 AR Path="/65DFE627/6627A53E" Ref="#PWR?"  Part="1" 
 AR Path="/6627A53E" Ref="#PWR021"  Part="1" 
-F 0 "#PWR021" H 5200 6200 50  0001 C CNN
-F 1 "GND" H 5205 6277 50  0000 C CNN
-F 2 "" H 5200 6450 50  0001 C CNN
-F 3 "" H 5200 6450 50  0001 C CNN
-	1    5200 6450
+F 0 "#PWR021" H 5250 6200 50  0001 C CNN
+F 1 "GND" H 5255 6277 50  0000 C CNN
+F 2 "" H 5250 6450 50  0001 C CNN
+F 3 "" H 5250 6450 50  0001 C CNN
+	1    5250 6450
 	-1   0    0    -1  
 $EndComp
 $Comp
@@ -1412,31 +1401,14 @@ Wire Wire Line
 	6450 6150 6600 6150
 Text Notes 4750 6450 0    50   ~ 0
 Ovr Shunt
+Connection ~ 5250 5850
 Wire Wire Line
-	5200 3900 5200 5850
-Wire Wire Line
-	5500 5850 5200 5850
-Connection ~ 5200 5850
-Wire Wire Line
-	5200 5850 5200 6050
+	5250 5850 5250 6050
 Connection ~ 6450 5850
 Wire Wire Line
 	6450 5850 6450 6150
 Wire Wire Line
 	5800 5850 6450 5850
-$Comp
-L Device:Q_NPN_CBE Q?
-U 1 1 6659FCF6
-P 5750 5050
-AR Path="/65DFE627/6659FCF6" Ref="Q?"  Part="1" 
-AR Path="/6659FCF6" Ref="Q2"  Part="1" 
-F 0 "Q2" H 5940 5096 50  0000 L CNN
-F 1 "2N2222" H 5940 5005 50  0000 L CNN
-F 2 "" H 5950 5150 50  0001 C CNN
-F 3 "~" H 5750 5050 50  0001 C CNN
-	1    5750 5050
-	-1   0    0    -1  
-$EndComp
 $Comp
 L Device:R R?
 U 1 1 6659FCFC
@@ -1463,8 +1435,6 @@ F 3 "" H 5650 5250 50  0001 C CNN
 	1    5650 5250
 	-1   0    0    -1  
 $EndComp
-Text Notes 5750 4900 0    50   ~ 0
-Ovr Sense
 Wire Wire Line
 	5000 3000 5000 3150
 $Comp
@@ -1488,14 +1458,7 @@ Wire Wire Line
 Wire Wire Line
 	4550 2500 4700 2500
 Wire Wire Line
-	6300 3150 5650 3150
-Wire Wire Line
 	6300 1250 6300 3150
-Connection ~ 5650 3150
-Wire Wire Line
-	5650 3150 5000 3150
-Wire Wire Line
-	5650 3150 5650 4850
 Connection ~ 6050 6250
 Wire Wire Line
 	6050 6250 6600 6250
@@ -1525,7 +1488,7 @@ $EndComp
 Wire Wire Line
 	5150 3800 5150 3700
 Wire Wire Line
-	5050 3700 5050 4300
+	5050 3700 5050 4150
 Wire Wire Line
 	4300 3800 4950 3800
 Connection ~ 4300 3800
@@ -1535,4 +1498,91 @@ Wire Wire Line
 Wire Wire Line
 	4400 3700 4400 4000
 Connection ~ 4400 4000
+Text Notes 5750 4900 0    50   ~ 0
+Ovr Sense
+$Comp
+L Device:Q_NPN_CBE Q?
+U 1 1 6659FCF6
+P 5750 5050
+AR Path="/65DFE627/6659FCF6" Ref="Q?"  Part="1" 
+AR Path="/6659FCF6" Ref="Q2"  Part="1" 
+F 0 "Q2" H 5940 5096 50  0000 L CNN
+F 1 "2N2222" H 5940 5005 50  0000 L CNN
+F 2 "" H 5950 5150 50  0001 C CNN
+F 3 "~" H 5750 5050 50  0001 C CNN
+	1    5750 5050
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5650 4650 5650 4850
+$Comp
+L Switch:SW_SPDT_SMALL SW?
+U 1 1 66A95683
+P 5200 4500
+F 0 "SW?" V 5129 4598 50  0001 L CNN
+F 1 "SW_SPDT_SMALL" V 5550 4100 50  0001 L CNN
+F 2 "" H 5150 4270 50  0001 C CNN
+F 3 "~" H 5150 4270 50  0001 C CNN
+	1    5200 4500
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5250 4650 5250 5850
+Wire Wire Line
+	5500 5850 5250 5850
+Wire Wire Line
+	5200 4300 5200 3900
+Wire Wire Line
+	5600 4300 5600 3150
+Connection ~ 5600 3150
+Wire Wire Line
+	5600 3150 5000 3150
+Wire Wire Line
+	5600 3150 6300 3150
+$Comp
+L power:GND #PWR?
+U 1 1 66BEBFAF
+P 5550 4650
+F 0 "#PWR?" H 5550 4400 50  0001 C CNN
+F 1 "GND" H 5555 4477 50  0000 C CNN
+F 2 "" H 5550 4650 50  0001 C CNN
+F 3 "" H 5550 4650 50  0001 C CNN
+	1    5550 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 66BECFD3
+P 5150 4650
+F 0 "#PWR?" H 5150 4400 50  0001 C CNN
+F 1 "GND" H 5155 4477 50  0000 C CNN
+F 2 "" H 5150 4650 50  0001 C CNN
+F 3 "" H 5150 4650 50  0001 C CNN
+	1    5150 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR012
+U 1 1 65D19661
+P 5050 4150
+F 0 "#PWR012" H 5050 3900 50  0001 C CNN
+F 1 "GND" H 5055 3977 50  0000 C CNN
+F 2 "" H 5050 4150 50  0001 C CNN
+F 3 "" H 5050 4150 50  0001 C CNN
+	1    5050 4150
+	1    0    0    -1  
+$EndComp
+Wire Notes Line
+	5200 4450 5600 4450
+$Comp
+L Switch:SW_SPDT_SMALL SW2
+U 1 1 66A5A149
+P 5600 4500
+F 0 "SW2" V 5500 4650 50  0000 L CNN
+F 1 "Master Override" V 5600 4650 50  0000 L CNN
+F 2 "" H 5550 4270 50  0001 C CNN
+F 3 "~" H 5550 4270 50  0001 C CNN
+	1    5600 4500
+	0    1    1    0   
+$EndComp
 $EndSCHEMATC
