@@ -19,8 +19,7 @@
 #
 #  sudo apt-get install python3-pigpio
 #
-# Set port permissions
-#   sudo chmod 666  /dev/i2c-1
+# Running user needs to be a member of groups: i2c, spi, gpio
 
 import argparse
 import datetime
