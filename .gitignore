@@ -3,6 +3,12 @@
 twilio.conf
 __pycache__
 
+# Kicad dregs #
+###############
+Poop-Valve/Poop-Valve-rescue.dcm
+Poop-Valve/Poop-Valve-rescue.lib
+Poop-Valve/sym-lib-table
+
 # Compiled source #
 ###################
 *.com
