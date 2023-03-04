@@ -189,16 +189,18 @@ def samplePoop():
 
 
 sampleInterval = 1  # Rate at which we sample poop level
+perSecond_lock = threading.Lock()  # Ensure we only run one at a time
 
 def perSecond():
     """Callback that runs every second to perform housekeeping duties"""
-    now = int(time.time())
-    if (int(datetime.datetime.now().second) % sampleInterval == 0):
-        samplePoop()
-    if (int(datetime.datetime.now().second) % 2 == 0):
-        beatHeart(Gpio.heart.device)
-    if (now % statusInterval == 0):
-        logging.info(printStatus())
-    checkOverride()
-    threading.Timer(1.0, perSecond).start()  # Redispatch self
+    with perSecond_lock:
+        threading.Timer(1.0, perSecond).start()  # Predispatch next self
+        now = int(time.time())
+        if (int(datetime.datetime.now().second) % sampleInterval == 0):
+            samplePoop()
+        if (int(datetime.datetime.now().second) % 2 == 0):
+            beatHeart(Gpio.heart.device)
+        if (now % statusInterval == 0):
+            logging.info(printStatus())
+        checkOverride()
 
