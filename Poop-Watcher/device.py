@@ -12,9 +12,20 @@ import adc
 import grove
 import pager
 
-statusInterval = 6     # Seconds between status updates without input changes
+interval = {
+    'sample': 1,
+    'heart': 2,
+    'status': 6,
+}
+
 overrideNotifySecs1 = 10     # Seconds before sending first page about manual override (5 minutes grace)
 overrideNotifySecs2 = 300    # Seconds between subsequent pages about manual override (daily)
+
+# Valve control thresholds
+threshold = {
+    "panic_value": pager.Pager.get_panic(),
+    "empty_value": pager.Pager.get_nominal(),
+}
 
 class Gpio:
 
@@ -25,7 +36,7 @@ class Gpio:
         Gpio.is_override = self.Sensor(pin=24, name='override')
 
         Gpio.do_enable = self.Control(pin=25, name='enable')
-        Gpio.do_open_close = self.Control(pin=26, name='open_close')
+        Gpio.set_direction = self.Control(pin=26, name='open_close')
         Gpio.heart = self.Control(pin=27, name='heart')    # heartLed
 
         Gpio.adc = adc.Adc()
@@ -114,6 +125,14 @@ class Gpio:
             self.device.off()
             logging.info(printStatus() + ' OFF:' + self.name)
 
+        def setOpen(self):
+            """Alias for turnOn() for set_direction control."""
+            self.turnOn()
+
+        def setClose(self):
+            """Alias for turnOff() for set_direction control."""
+            self.turnOff()
+
         def is_active(self):
             return(self.device.value == 1)
 
@@ -127,9 +146,9 @@ def printStatus():
     """Return a string with the formatted status."""
     status = ''
     ### print(util.timestamp(), threading.get_ident(), end=' ')
-    poopLevel = Gpio.adc.get_value()
-    poopVolts = Gpio.adc.get_voltage()
-    poopPercent = Gpio.adc.get_percent()
+    poopLevel, poopVolts, poopPercent = Gpio.adc.get_values()
+    #poopVolts = Gpio.adc.get_voltage()
+    #poopPercent = Gpio.adc.get_percent()
     status += "POOP:{}%-{}-{}v ".format(poopPercent, poopLevel, poopVolts)
     grove.Grove.updatePoop(poopPercent, poopLevel, poopVolts)
 
@@ -182,25 +201,69 @@ def checkOverride():
             Gpio.is_override.activated_ts = -1
 
 
-def samplePoop():
-    """Read the ADC and Do The Right Thing(tm) with respect to poop level."""
-    # Should this live in adc.py?
-    pass
+valveStartTime = 0      # Time we started the valve operation
+valveTimeExceeded = 30  # Seconds inside of which the operation should succeeed
+
+def operateValve(op):
+    """Open or Close the valve; keep checking back to ensure operation completes."""
+    now = int(time.time())
+    if (valveStartTime <= 0):
+        # No operation is going on right now
+        if ((op == 'close' and Gpio.is_closed.isOn()) or (op == 'open' and Gpio.is_open.isOn())):
+            return   # Valve is already in the state we want
+        msg = "{}ing water main valve".format(op)
+        logging.info("operateValve(): {}".format(msg))
+        pager.notify("NOTICE: {}".format(msg))
+        Gpio.set_direction.setClose() if (op == 'close') else Gpio.set_direction.setOpen() 
+        Gpio.do_enable.turnOn()
+        valveStartTime = now
+
+    else:
+        # Operation in progress
+        elapsed = now - valveStartTime
+        if ((op == 'close' and Gpio.is_closed.isOn()) or (op == 'open' and Gpio.is_open.isOn())):
+            logging.info("operateValve(): valve {}ed after {} seconds".format(op[0:3], elapsed))
+            Gpio.do_enable.turnOff()
+            valveStartTime = 0
+        else:
+            if (elapsed > valveTimeExceeded):
+                msg = "valve failed to {} after {} seconds; giving up".format(op, elapsed)
+                logging.error("operateValve(): {}".format(msg))
+                pager.notify("WARNING: {}".format(msg))
+                Gpio.do_enable.turnOff()
+                valveStartTime = 0
+
+def maybeOperateValve(value):
+    """Open or close the valve if threshold conditions are met."""
+    if (Gpio.is_closed.isOff()):
+        if (value >= threshold["panic_value"]):
+            operateValve('close')
+    elif (Gpio.is_open.isOff()):
+        if (value <= threshold["empty_value"]):
+            operateValve('open')
+
+def checkPoop():
+    """Read the ADC and Do The Right Thing(tm) as regards the poop level."""
+    value, voltage, percent = Gpio.adc.get_values()
+    pager.Pager.poop_notify(value, voltage, percent)
+    maybeOperateValve(value)
 
 
-sampleInterval = 1  # Rate at which we sample poop level
-perSecond_lock = threading.Lock()  # Ensure we only run one at a time
+perSecond_lock = threading.Lock()  # Ensure we run perSecond only one at a time
 
 def perSecond():
     """Callback that runs every second to perform housekeeping duties"""
     with perSecond_lock:
         threading.Timer(1.0, perSecond).start()  # Predispatch next self
+
         now = int(time.time())
-        if (int(datetime.datetime.now().second) % sampleInterval == 0):
-            samplePoop()
-        if (int(datetime.datetime.now().second) % 2 == 0):
+        if (now % interval['sample'] == 0):
+            Gpio.adc.do_sample()
+        if (now % interval['heart'] == 0):
             beatHeart(Gpio.heart.device)
-        if (now % statusInterval == 0):
+        if (now % interval['status'] == 0):
             logging.info(printStatus())
+
+        checkPoop()
         checkOverride()
 
