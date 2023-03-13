@@ -34,7 +34,6 @@ import sys
 import threading
 from time import sleep
 
-import arduino
 import device
 import grove
 import pager
