@@ -23,11 +23,21 @@ class Grove:
     LINE0 = 0x80
     LINE1 = 0xC0
 
-    # To toggle updatePoop() between volts and abs value
-    toggle = False
-
     def __init(self, version='v?'):
         logging.debug("grove.init()")
+
+        if sys.platform == 'uwp':
+            import winrt_smbus as smbus
+            self.bus = smbus.SMBus(1)
+        else:
+            import smbus
+            import RPi.GPIO as GPIO
+            rev = GPIO.RPI_REVISION
+            if rev == 2 or rev == 3:
+                self.bus = smbus.SMBus(1)
+            else:
+                self.bus = smbus.SMBus(0)
+
         self.sendCommand(0x08 | 0x04)    # display on, no cursor
         self.sendCommand(0x28)           # 2 lines
         time.sleep(.05)
@@ -44,6 +54,26 @@ class Grove:
             self.bus.write_byte_data(self.DISPLAY_RGB_ADDR, 4, r)
             self.bus.write_byte_data(self.DISPLAY_RGB_ADDR, 3, g)
             self.bus.write_byte_data(self.DISPLAY_RGB_ADDR, 2, b)
+
+    @classmethod
+    def setColor(self, color):
+        """Set the backlight to a common color."""
+        if (color == 'red'):
+            self.setRGB(255,0,0)
+        elif (color == 'green'):
+            self.setRGB(0,255,0);
+        elif (color == 'blue'):
+            self.setRGB(0,0,255)
+        elif (color == 'cyan'):
+            self.setRGB(0,255,255)
+        elif (color == 'indigo'):
+            self.setRGB(255,0,255)
+        elif (color == 'yellow'):
+            self.setRGB(255,255,0)
+        elif (color == 'orange'):
+            self.setRGB(255,64,0)
+        else:
+            logging.error("grove.setColor: {} unknown".format(color))
 
     @classmethod
     def sendCommand(self, cmd):
@@ -129,19 +159,6 @@ class Grove:
         for c in text:
             self.printChar(c)
 
-    #
-    # Above here is pretty generica stuff; the rest is Poop Meter specific
-    #
-
-    @classmethod
-    def updatePoop(self, poopPercent, poopLevel, poopVolts):
-        """Update the poop level display on line 1."""
-        logging.debug("grove.updatePoop({},{},{})".format(poopPercent, poopLevel, poopVolts))
-        if (self.toggle == False):
-            self.printLine("{}% ({}a)".format(poopPercent, poopLevel), line=1)
-        else:
-            self.printLine("{}% ({}v)".format(poopPercent, poopVolts), line=1)
-        self.toggle = not(self.toggle)
 
 # Unit test
 if (__name__ == "__main__"):
@@ -161,6 +178,12 @@ if (__name__ == "__main__"):
     lcd.selectLine(1)
     lcd.printLine("This is line 1")
     time.sleep(1)
+
+    for color in [ 'red', 'green', 'blue', 'cyan', 'purple', 'yellow', 'orange' ]:
+        lcd.printLine(color, line=1)
+        lcd.setColor(color)
+        print(color)
+        time.sleep(2)
 
     direction = -1
     while (True):
