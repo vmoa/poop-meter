@@ -18,9 +18,6 @@ interval = {
     'status': 6,
 }
 
-overrideNotifySecs1 = 10     # Seconds before sending first page about manual override (5 minutes grace)
-overrideNotifySecs2 = 300    # Seconds between subsequent pages about manual override (daily)
-
 # Valve control thresholds
 threshold = {
     "panic_value": pager.Pager.get_panic(),
@@ -29,8 +26,8 @@ threshold = {
 
 class Gpio:
 
-    def __init__(self):
-        """Connect all our devices. Set `simulator` to increase timings so a human can respond."""
+    def __init__(self, simulate = False):
+        """Connect all our devices. Set `simulate` to manipulate timings."""
         Gpio.is_opened = self.Sensor(pin=22, name='opened')
         Gpio.is_closed = self.Sensor(pin=23, name='closed')
         Gpio.is_override = self.Sensor(pin=24, name='override')
@@ -40,6 +37,9 @@ class Gpio:
         Gpio.heart = self.Control(pin=27, name='heart')    # heartLed
 
         Gpio.adc = adc.Adc()
+
+        if (simulate):
+            Override.simulateMode()
 
 
     class Sensor:
@@ -62,17 +62,6 @@ class Gpio:
             Gpio.Sensor.by_pin[pin] = self
             Gpio.Sensor.names.append(name)
 
-            # Initialize override timers
-            if (name == 'override'):
-                if (self.isOn()):
-                    logging.warning("Manual override is enabled; will notify in {} if still set".format(datetime.timedelta(seconds=overrideNotifySecs1)))
-                    now = time.time()
-                    self.activated_ts = now
-                    self.notify_ts = now + overrideNotifySecs1
-                else:
-                    self.activated_ts = -1
-                    self.notify_ts = -1
-
         def is_active(self):
             return(self.device.is_active)
 
@@ -86,18 +75,12 @@ class Gpio:
         def activated(self):
             logging.info(printStatus() + ' HIGH:' + self.name)
             if (self.name == 'override'):
-                logging.warning("Manual override is enabled; will notify in {} if still set".format(datetime.timedelta(seconds=overrideNotifySecs1)))
-                now = time.time()
-                self.activated_ts = now
-                self.notify_ts = now + overrideNotifySecs1
+                Override.check()
 
         def deactivated(self):
             logging.info(printStatus() + ' LOW:' + self.name)
             if (self.name == 'override'):
-                logging.warning("Manual override cleared")
-                checkOverride()
-                self.activated_ts = -1
-                self.notify_ts = -1
+                Override.check()
 
 
     class Control:
@@ -183,23 +166,6 @@ def beatHeart(output=0, step=0):
     else:
         logging.error("WTF? beatHeart() called with step %".format(step))
 
-def checkOverride():
-    """Check if manual override is set and notify at regular intervals."""
-    if (Gpio.is_override.isOn()):
-        now = time.time()
-        # print("{} > {}".format(int(now), int(Gpio.is_override.notify_ts)))
-        if (Gpio.is_override.notify_ts > 0 and now > Gpio.is_override.notify_ts):
-            pager.Pager.send("WARNING: manual override has been enabled for {}; poop valve operation suspended"
-                       .format(datetime.timedelta(seconds=int(now-Gpio.is_override.activated_ts))))
-            Gpio.is_override.notify_ts = now + overrideNotifySecs2
-    else:
-        if (Gpio.is_override.notify_ts > 0):
-            now = time.time()
-            pager.Pager.send("INFO: manual override disabled after {}"
-                       .format(datetime.timedelta(seconds=int(now-Gpio.is_override.activated_ts))))
-            Gpio.is_override.notify_ts = -1
-            Gpio.is_override.activated_ts = -1
-
 
 
 class Valve:
@@ -260,6 +226,57 @@ class Valve:
             if (value <= threshold["empty_value"]):
                 cls.operate('open')
 
+class Override:
+
+    initialNotifySec = 300      # Seconds before sending first page about manual override (5 minutes grace)
+    repeatNotifySec = 86400     # Seconds between subsequent pages about manual override (daily)
+
+    startTime = 0           # Time override detected
+    notifyNext = 0          # Time for next notification
+    notifySent = False      # Whether we sent a notification or not
+
+    def __init__(self, simulate=False):
+        pass
+
+    @classmethod
+    def simulateMode(cls):
+        logging.info("Override in simulate mode -- notifications sent every 10 seconds")
+        cls.initialNotifySec = 10
+        cls.repeatNotifySec = 10
+
+    @classmethod
+    def notifyMaybe(cls):
+        """Send override notification if it's time."""
+        now = time.time()
+        if (cls.notifyNext > 0 and now >= cls.notifyNext):
+            pager.Pager.send("WARNING: manual override has been enabled for {}; poop valve operation suspended"
+                       .format(datetime.timedelta(seconds=int(now - cls.startTime))))
+            cls.notifySent = True
+            cls.notifyNext = now + cls.repeatNotifySec
+
+    @classmethod
+    def check(cls):
+        """Check if manual override is set and, after a grace period, notify at regular intervals."""
+        now = time.time()
+        if (Gpio.is_override.isOn()):
+            if (cls.startTime > 0):
+                cls.notifyMaybe()
+            else:
+                logging.warning("Manual override is enabled; will notify in {} seconds if still set".format(cls.initialNotifySec))
+                cls.startTime = now
+                cls.notifyNext = now + cls.initialNotifySec
+
+        else:   # Gpio.is_override is off
+            if (cls.startTime > 0):
+                msg = "manual override disabled after {}".format(datetime.timedelta(seconds=int(now - cls.startTime)))
+                logging.warning(msg)
+                cls.startTime = 0
+                if (cls.notifySent):
+                    pager.Pager.send(msg)
+                    cls.notifyNext = 0
+                    cls.notifySent = False
+
+
 def checkPoop():
     """Read the ADC and Do The Right Thing(tm) as regards the poop level."""
     value, voltage, percent = Gpio.adc.get_values()
@@ -283,5 +300,5 @@ def perSecond():
             logging.info(printStatus())
 
         checkPoop()
-        checkOverride()
+        Override.check()
 
