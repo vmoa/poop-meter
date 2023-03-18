@@ -133,12 +133,12 @@ class Pager:
                 return(a["threshold"])
         logging.error("pager.get_nominal(): cannot find nominal!")
 
-    poopmessage = "Poop level {}: {:1.0f}% ({:d}, {:3.2}v)"  # Poop level PANIC|URGENT|High|nominal: 93% (128, 4.12v)
+    poopmessage = "Poop level {}: {:1.0f}% ({:d}, {:3.2}v) Valve:{}"  # Poop level PANIC|URGENT|High|nominal: 93% (128, 4.12v) Valve:open|closed
     last_poopalert = poopmap[0]
     last_pooptime = 0
 
     @classmethod
-    def poop_notify(cls, value, voltage, percent, recip=None):
+    def poop_notify(cls, value, voltage, percent, valve, recip=None):
         """Format and send poop message, throttled according to `frequency` defined in poopmap."""
         now = int(time.time())
 
@@ -151,7 +151,7 @@ class Pager:
         elapsed = now - cls.last_pooptime
 
         if ((p != cls.last_poopalert) or (elapsed > alert["frequency"])):
-            cls.send(cls.poopmessage.format(alert["severity"], percent, value, voltage))
+            cls.send(cls.poopmessage.format(alert["severity"], percent, value, voltage, valve))
             cls.last_poopalert = p
             cls.last_pooptime = now
 

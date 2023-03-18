@@ -295,7 +295,13 @@ class Poop:
     def check():
         """Read the ADC and Do The Right Thing(tm) as regards the poop level."""
         value, voltage, percent = Gpio.adc.get_values()
-        pager.Pager.poop_notify(value, voltage, percent)
+        if (Gpio.is_opened.isOn()):
+            valve = 'open'
+        elif (Gpio.is_closed.isOn()):
+            valve = 'closed'
+        else:
+            valve = 'midway'
+        pager.Pager.poop_notify(value, voltage, percent, valve)
         Valve.maybeOperate(value)
 
 
