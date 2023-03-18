@@ -24,11 +24,11 @@ class Adc:
 
     # Holding places for averaged values
     value = -1
-    voltage = -1
-    percent = -1
+    voltage = -1.0
+    percent = -1.0
 
     # Value returned when the tank is ready to burst
-    full_value = 65535
+    full_value = 1024
 
     def __init__(self):
         """Initialize the spi bus and chip select and create the mcp object."""
@@ -51,23 +51,25 @@ class Adc:
         self.chan = AnalogIn(mcp, pin1, pin2)
 
     def abs_value(self):
-        testprint("abs_value(): {}".format(self.chan.value))
-        return(self.chan.value)
+        v = int(self.chan.value / 63)  # Restore scale; why do I have to do this???
+        testprint("abs_value(): {}".format(v))
+        return(v)
 
     def abs_voltage(self):
         testprint("abs_voltage(): {}".format(self.chan.voltage))
-        return(self.chan.voltage)
+        return(float(self.chan.voltage))
 
     def average(self, array, sample):
         """Prepend new sample to the array, turncate at num_samples, and return the average."""
         array.insert(0, sample)     # TODO: Should probably do something to ignore crazy outliers
         del(array[self.num_samples:])
-        return(round(mean(array)))
+        testprint("average() array: {}".format(array))
+        return(float(mean(array)))
 
     def do_sample(self):
         """Collect and average new samples, storing them in class variables for later retrieval.
            This should be called at a regular interval by device.per_second()."""
-        self.value = self.average(self.val_array, self.abs_value())
+        self.value = int(self.average(self.val_array, self.abs_value()))
         self.voltage = self.average(self.voltage_array, self.abs_voltage())
         self.percent = self.value / self.full_value * 100
 
@@ -77,11 +79,11 @@ class Adc:
 
     def get_voltage(self):
         """Return the average voltage over the last <num_samples>."""
-        return(self.voltage)
+        return(float(self.voltage))
 
     def get_percent(self):
         """Return the percentage full using averaged <value> as index."""
-        return(self.percent)
+        return(float(self.percent))
 
     def get_values(self):
         """Return all three averaged values (value, voltabe, percentage)."""
@@ -98,9 +100,10 @@ if (__name__ == "__main__"):
     adc = Adc()
 
     while (1):
-        print("ABS: {} {}v --- AVG: {} {}v {}%".format(
-            adc.abs_value(), adc.abs_voltage(),
-            adc.get_value(), adc.get_voltage(), adc.get_percent()))
+        adc.do_sample()
+        print("ABS: {value} {volt:4.2f}v --- AVG: {avg_value} {avg_volt:3.2f}v {pct:2.1f}%".format(
+            value=adc.abs_value(), volt=adc.abs_voltage(),
+            avg_value=int(adc.get_value()), avg_volt=adc.get_voltage(), pct=adc.get_percent()))
         sleep(1)
         
     #poopLevel, poopVolts, poopPercent = Gpio.adc.get_values()
