@@ -26,7 +26,7 @@ threshold = {
 
 class Gpio:
 
-    def __init__(self, simulate = False):
+    def __init__(self, lcd, simulate = False):
         """Connect all our devices. Set `simulate` to manipulate timings."""
         Gpio.is_opened = self.Sensor(pin=22, name='opened')
         Gpio.is_closed = self.Sensor(pin=23, name='closed')
@@ -37,6 +37,7 @@ class Gpio:
         Gpio.heart = self.Control(pin=27, name='heart')    # heartLed
 
         Gpio.adc = adc.Adc()
+        Gpio.lcd = lcd;
 
         if (simulate):
             Override.simulateMode()
@@ -127,14 +128,10 @@ class Gpio:
 
 def printStatus():
     """Return a string with the formatted status."""
-    status = ''
-    ### print(util.timestamp(), threading.get_ident(), end=' ')
     poopLevel, poopVolts, poopPercent = Gpio.adc.get_values()
-    #poopVolts = Gpio.adc.get_voltage()
-    #poopPercent = Gpio.adc.get_percent()
-    status += "POOP:{pct:3.1f}%-{val}-{volt:3.2f}v ".format(pct=poopPercent, val=poopLevel, volt=poopVolts)
-    grove.Grove.updatePoop(poopPercent, poopLevel, poopVolts)
+    Gpio.lcd.printLine("{:3d}% {:4.2f}v {:4d}".format(int(poopPercent), poopVolts, int(poopLevel)), line=1)   # 100% 3.45v 1024
 
+    status = "POOP:{pct:3.1f}%-{val}-{volt:3.2f}v ".format(pct=poopPercent, val=poopLevel, volt=poopVolts)
     for sensor in Gpio.Sensor.sensors:
         if (sensor.is_active()):
             status += "[{}] ".format(sensor.name.upper())
