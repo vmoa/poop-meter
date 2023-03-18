@@ -90,7 +90,7 @@ def initialize():
     sleep(2)  # This should be an LCD freeze display option intead of a sleep
 
     # Initialize devices
-    gpio = device.Gpio()
+    gpio = device.Gpio(simulate = args.simulate)
     logging.info(device.printStatus())
 
     # Initialize pager
