@@ -149,7 +149,7 @@ def printStatus():
     poopLevel, poopVolts, poopPercent = Gpio.adc.get_values()
     #poopVolts = Gpio.adc.get_voltage()
     #poopPercent = Gpio.adc.get_percent()
-    status += "POOP:{}%-{}-{}v ".format(poopPercent, poopLevel, poopVolts)
+    status += "POOP:{pct:3.1f}%-{val}-{volt:3.2f}v ".format(pct=poopPercent, val=poopLevel, volt=poopVolts)
     grove.Grove.updatePoop(poopPercent, poopLevel, poopVolts)
 
     for sensor in Gpio.Sensor.sensors:
@@ -201,52 +201,70 @@ def checkOverride():
             Gpio.is_override.activated_ts = -1
 
 
-valveStartTime = 0      # Time we started the valve operation
-valveTimeExceeded = 30  # Seconds inside of which the operation should succeeed
 
-def operateValve(op):
-    """Open or Close the valve; keep checking back to ensure operation completes."""
-    now = int(time.time())
-    if (valveStartTime <= 0):
-        # No operation is going on right now
-        if ((op == 'close' and Gpio.is_closed.isOn()) or (op == 'open' and Gpio.is_open.isOn())):
-            return   # Valve is already in the state we want
-        msg = "{}ing water main valve".format(op)
-        logging.info("operateValve(): {}".format(msg))
-        pager.notify("NOTICE: {}".format(msg))
-        Gpio.set_direction.setClose() if (op == 'close') else Gpio.set_direction.setOpen() 
-        Gpio.do_enable.turnOn()
-        valveStartTime = now
+class Valve:
 
-    else:
-        # Operation in progress
-        elapsed = now - valveStartTime
-        if ((op == 'close' and Gpio.is_closed.isOn()) or (op == 'open' and Gpio.is_open.isOn())):
-            logging.info("operateValve(): valve {}ed after {} seconds".format(op[0:3], elapsed))
-            Gpio.do_enable.turnOff()
-            valveStartTime = 0
+    valveTimeExceeded = 30  # Seconds inside of which the operation should succeeed
+    valveStartTime = 0      # Time we started the valve operation
+    operation = None        # Operation in progress
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def operate(cls, op):
+        """Open or Close the valve; keep checking back to ensure operation completes."""
+        now = int(time.time())
+        if (cls.valveStartTime == 0):
+            # No operation is going on right now
+            if ((op == 'close' and Gpio.is_closed.isOn()) or (op == 'open' and Gpio.is_opened.isOn())):
+                return   # Valve is already in the state we want
+            msg = "{}ing water main valve".format(op[0:4])
+            logging.info("Valve.operate(): {}".format(msg))
+            pager.Pager.send("NOTICE: {}".format(msg))
+            if (op == 'close'):
+                Gpio.set_direction.setClose()
+            else:
+                Gpio.set_direction.setOpen()
+            Gpio.do_enable.turnOn()
+            cls.valveStartTime = now
+            cls.operation = op
+
         else:
-            if (elapsed > valveTimeExceeded):
-                msg = "valve failed to {} after {} seconds; giving up".format(op, elapsed)
-                logging.error("operateValve(): {}".format(msg))
-                pager.notify("WARNING: {}".format(msg))
+            # Operation in progress
+            elapsed = now - cls.valveStartTime
+            if ((op == 'close' and Gpio.is_closed.isOn()) or (op == 'open' and Gpio.is_opened.isOn())):
+                logging.info("Valve.operate(): valve {}ed after {} seconds".format(op[0:4], elapsed))
                 Gpio.do_enable.turnOff()
-                valveStartTime = 0
+                cls.valveStartTime = 0
+                cls.operation = None
+            else:
+                if (elapsed > cls.valveTimeExceeded):
+                    msg = "valve failed to {} after {} seconds; giving up".format(op, elapsed)
+                    logging.error("Valve.operate(): {}".format(msg))
+                    pager.Pager.send("WARNING: {}".format(msg))
+                    Gpio.do_enable.turnOff()
+                    cls.valveStartTime = 0
+                    cls.operation = None
 
-def maybeOperateValve(value):
-    """Open or close the valve if threshold conditions are met."""
-    if (Gpio.is_closed.isOff()):
-        if (value >= threshold["panic_value"]):
-            operateValve('close')
-    elif (Gpio.is_open.isOff()):
-        if (value <= threshold["empty_value"]):
-            operateValve('open')
+    @classmethod
+    def maybeOperate(cls, value):
+        """Open or close the valve if threshold conditions are met."""
+        if (cls.operation):
+            # Operation in progress
+            cls.operate(cls.operation)  # Operation in progress
+        if (Gpio.is_closed.isOff()):
+            if (value >= threshold["panic_value"]):
+                cls.operate('close')
+        elif (Gpio.is_opened.isOff()):
+            if (value <= threshold["empty_value"]):
+                cls.operate('open')
 
 def checkPoop():
     """Read the ADC and Do The Right Thing(tm) as regards the poop level."""
     value, voltage, percent = Gpio.adc.get_values()
     pager.Pager.poop_notify(value, voltage, percent)
-    maybeOperateValve(value)
+    Valve.maybeOperate(value)
 
 
 perSecond_lock = threading.Lock()  # Ensure we run perSecond only one at a time
