@@ -216,6 +216,15 @@ class Valve:
     @classmethod
     def maybeOperate(cls, value):
         """Open or close the valve if threshold conditions are met."""
+
+        # We can't do anything if manual override is set
+        if (Override.check()):
+            if (cls.operation):
+                logging.warning("Manual override interrupted valve {}! Cancelling operation.".format(cls.operation))
+                cls.operation = False
+                cls.valveStartTime = 0
+            return
+
         if (cls.operation):
             # Operation in progress
             cls.operate(cls.operation)  # Operation in progress
@@ -265,6 +274,7 @@ class Override:
                 logging.warning("Manual override is enabled; will notify in {} seconds if still set".format(cls.initialNotifySec))
                 cls.startTime = now
                 cls.notifyNext = now + cls.initialNotifySec
+            return True
 
         else:   # Gpio.is_override is off
             if (cls.startTime > 0):
@@ -275,13 +285,18 @@ class Override:
                     pager.Pager.send(msg)
                     cls.notifyNext = 0
                     cls.notifySent = False
+            return False
 
 
-def checkPoop():
-    """Read the ADC and Do The Right Thing(tm) as regards the poop level."""
-    value, voltage, percent = Gpio.adc.get_values()
-    pager.Pager.poop_notify(value, voltage, percent)
-    Valve.maybeOperate(value)
+class Poop:
+    def __init__(self):
+        pass
+
+    def check():
+        """Read the ADC and Do The Right Thing(tm) as regards the poop level."""
+        value, voltage, percent = Gpio.adc.get_values()
+        pager.Pager.poop_notify(value, voltage, percent)
+        Valve.maybeOperate(value)
 
 
 perSecond_lock = threading.Lock()  # Ensure we run perSecond only one at a time
@@ -299,6 +314,5 @@ def perSecond():
         if (now % interval['status'] == 0):
             logging.info(printStatus())
 
-        checkPoop()
-        Override.check()
+        Poop.check()
 
