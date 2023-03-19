@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #
 # Manage the poop meter and water main vavle
 #   Reads analog voltage from poop probe via the ADC connected to the SPI bus and operates the remote valve
