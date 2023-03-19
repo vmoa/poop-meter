@@ -67,17 +67,27 @@ class Valve:
         if (override.Override.check()):
             if (cls.operation):
                 logging.warning("Manual override interrupted valve {}! Cancelling operation.".format(cls.operation))
-                cls.operation = False
+                cls.operation = None
                 cls.valveStartTime = 0
             return
 
         if (cls.operation):
             # Operation in progress
             cls.operate(cls.operation)
-        if (device.Gpio.is_closed.isOff()):
-            if (value >= poop.Poop.threshold["PANIC"]):
+            return
+
+        if (value >= poop.Poop.threshold["PANIC"]):
+            if (device.Gpio.is_closed.isOff()):
                 cls.operate('close')
-        elif (device.Gpio.is_opened.isOff()):
-            if (value <= poop.Poop.threshold["nominal"]):
+        if (value <= poop.Poop.threshold["nominal"]):
+            if (device.Gpio.is_opened.isOff()):
                 cls.operate('open')
 
+        if (device.Gpio.is_opened.isOff() and device.Gpio.is_closed.isOff()):
+            # This case can happen if we manually override or power fail during an operation
+            logging.error("Valve is midway but no operation is in progress; forcing an operation")
+            cls.valveStartTime = 0  # Just in case
+            if (value >= poop.Poop.threshold["PANIC"]):
+                cls.operate('close')
+            else:
+                cls.operate('open')
