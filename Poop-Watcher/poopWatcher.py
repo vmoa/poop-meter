@@ -37,6 +37,7 @@ from time import sleep
 import device
 import grove
 import pager
+import poop
 import valve
 
 
@@ -91,7 +92,7 @@ def initialize():
 
     # Initialize devices
     gpio = device.Gpio(lcd = lcd, simulate = args.simulate)
-    logging.info(device.printStatus())
+    logging.info(poop.Poop.printStatus())
 
     # Initialize pager
     mypager = pager.Pager(simulate = args.simulate)
@@ -104,7 +105,7 @@ def initialize():
 if __name__ == '__main__':
     """Set up interrupts and a per-second callback, the pause forever"""
     args = initialize()
-    device.perSecond()
+    poop.Poop.perSecond()
 
     if (args.test_mode):
         logging.info("Entering test mode")
