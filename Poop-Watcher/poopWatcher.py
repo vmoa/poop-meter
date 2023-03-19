@@ -39,13 +39,13 @@ import poop
 import valve
 
 
-version = 'v0.9.3'      # Poop Watcher version
+version = 'v0.9.4'      # Poop Watcher version
 lockfile = 0            # Global so when we lock we keep it
 lockfilename = '/tmp/poop.lock'
 
 def initialize():
     # Parse command line args
-    default_logfile = '/var/log/poop.log'   # TODO: change this to daily rotation from perl code
+    default_logfile = '/var/log/poop.log'   # TODO: change this to daily rotation
     parser = argparse.ArgumentParser(description='RFO Poop Tank (septic) controller.')
     parser.add_argument('--debug', dest='debug', action='store_true', help='include DEBUG messages in logs')
     parser.add_argument('--test-mode', dest='test_mode', action='store_true', help='enter test mode')
