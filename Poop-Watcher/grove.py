@@ -19,11 +19,14 @@ class Grove:
     # Ensure we only run one command at a time
     grove_lock = threading.Lock()
 
+    # Timestamp to allow for latent messages
+    printOK = 0
+
     # Bitmasks for cursor positioning
     LINE0 = 0x80
     LINE1 = 0xC0
 
-    def __init(self, version='v?'):
+    def __init(self):
         logging.debug("grove.init()")
 
         if sys.platform == 'uwp':
@@ -41,11 +44,13 @@ class Grove:
         self.sendCommand(0x08 | 0x04)    # display on, no cursor
         self.sendCommand(0x28)           # 2 lines
         time.sleep(.05)
-        self.setText("Poop Meter {}\nLet's Poop!".format(version))
 
     @classmethod
     def setRGB(self, r, g, b):
         """Set backlight color (values from 0..255 for each)."""
+        now = int(time.time())
+        if (now <= self.printOK):
+            return
         with self.grove_lock:
             logging.debug("grove.setRGB({},{},{})".format(r,g,b))
             self.bus.write_byte_data(self.DISPLAY_RGB_ADDR, 0, 0)
@@ -149,15 +154,27 @@ class Grove:
             self.bus.write_byte_data(self.DISPLAY_TEXT_ADDR, 0x40, ord(c))
 
     @classmethod
-    def printLine(self, text, line=0):
-        """Set text on current (or specified) line and truncate to EOL."""
+    def printLine(self, text, line=-1):
+        """Set text on current (or specified) line and truncate to EOL. Lines are numbered 0 and 1."""
         logging.debug("grove.printLine({},{})".format(text,line))
-        if (line > 0):
+        now = int(time.time())
+        if (now <= self.printOK):
+            return
+        if (line >= 0):
             self.selectLine(line)
         text += ' '*16      # Space pad at end
         text = text[:16]    # And truncate
         for c in text:
             self.printChar(c)
+
+    @classmethod
+    def latentMessage(self, text, delay):
+        """Print a message (eg: the boot message) and set a timer to prevent overwriting."""
+        now = int(time.time())
+        if (now <= self.printOK):
+            return
+        self.setText(text)
+        self.printOK = now + delay
 
 
 # Unit test
