@@ -1,14 +1,11 @@
 #
 # Manage the poop meter and water main vavle
-#   Reads serial data from Arduino, but also reads analog data from poop probe via SPI
-#   In this version, the Arduino data is canonical and SPI data is recorded for comparison
-#   Once we get corellation between Arduino and SPI data we switch to SPI and retire Arduino
+#   Reads analog voltage from poop probe via the ADC connected to the SPI bus and operates the remote valve
+#   to shut off the water main before the holding take is full.  Also sends SMS satatus notifications.
 #
-# Requires SPI for reading from the MCP3009 analog/digital converter
+# Requires SPI for reading from the MCP3008 analog/digital converter
 # Requires I2C for updating status on the the Grove LCD (https://wiki.seeedstudio.com/Grove-LCD_RGB_Backlight/)
 #   raspi-config --> interfacing --> {spi,i2c}
-#
-# The running user must be a member of groups gpio and spi
 #
 # We also use:
 #   gpiozero (https://gpiozero.readthedocs.io/en/stable/) pip3 install gpiozero rpi.gpio
@@ -36,13 +33,13 @@ from time import sleep
 
 import device
 import grove
+import override
 import pager
 import poop
 import valve
 
 
 version = 'v0.9.3'      # Poop Watcher version
-statusInterval = 60     # Seconds between status updates without input changes
 lockfile = 0            # Global so when we lock we keep it
 lockfilename = '/tmp/poop.lock'
 
@@ -91,7 +88,9 @@ def initialize():
     sleep(2)  # This should be an LCD freeze display option intead of a sleep
 
     # Initialize devices
-    gpio = device.Gpio(lcd = lcd, simulate = args.simulate)
+    gpio = device.Gpio(lcd = lcd)
+    poop.Poop.simulateMode(args.simulate)
+    override.Override.simulateMode(args.simulate)
     logging.info(poop.Poop.printStatus())
 
     # Initialize pager

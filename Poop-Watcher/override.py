@@ -22,14 +22,15 @@ class Override:
     notifyNext = 0          # Time for next notification
     notifySent = False      # Whether we sent a notification or not
 
-    def __init__(self, simulate=False):
+    def __init__(self):
         pass
 
     @classmethod
-    def simulateMode(cls):
-        logging.info("Override in simulate mode -- notifications sent every 10 seconds")
-        cls.initialNotifySec = 10
-        cls.repeatNotifySec = 10
+    def simulateMode(cls, simulate):
+        if (simulate):
+            logging.info("Override in simulate mode -- notifications sent every 10 seconds")
+            cls.initialNotifySec = 10
+            cls.repeatNotifySec = 10
 
     @classmethod
     def notifyMaybe(cls):

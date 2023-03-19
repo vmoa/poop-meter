@@ -74,10 +74,12 @@ class Poop:
         pass
 
     @classmethod
-    def simulate_mode(cls):
+    def simulateMode(cls, simulate):
         """Override all alert frequencies and set to 10 seconds."""
-        for entry in cls.poopmap:
-            entry["frequency"] = 1
+        if (simulate):
+            logging.info("Poop in simulate mode -- notifications sent every 10 seconds")
+            for entry in cls.poopmap:
+                entry["frequency"] = 10
 
     @classmethod
     def poop_notify(cls, value, voltage, percent, valve, recip=None):

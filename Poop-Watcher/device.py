@@ -16,8 +16,8 @@ import poop
 
 class Gpio:
 
-    def __init__(self, lcd, simulate = False):
-        """Connect all our devices. Set `simulate` to manipulate timings."""
+    def __init__(self, lcd):
+        """Connect all our devices."""
         Gpio.is_opened = self.Sensor(pin=22, name='opened')
         Gpio.is_closed = self.Sensor(pin=23, name='closed')
         Gpio.is_override = self.Sensor(pin=24, name='override')
@@ -28,9 +28,6 @@ class Gpio:
 
         Gpio.adc = adc.Adc()
         Gpio.lcd = lcd;
-
-        if (simulate):
-            override.Override.simulateMode()
 
 
     class Sensor:
