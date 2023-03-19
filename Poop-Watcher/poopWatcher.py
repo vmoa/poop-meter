@@ -41,7 +41,7 @@ import poop
 import valve
 
 
-version = 'v0.9.2'      # Poop Watcher version
+version = 'v0.9.3'      # Poop Watcher version
 statusInterval = 60     # Seconds between status updates without input changes
 lockfile = 0            # Global so when we lock we keep it
 lockfilename = '/tmp/poop.lock'
