@@ -12,13 +12,7 @@ import device
 import grove
 import override
 import pager
-
-# Valve control thresholds
-threshold = {
-    "panic_value": pager.Pager.get_panic(),
-    "empty_value": pager.Pager.get_nominal(),
-}
-
+import poop
 
 class Valve:
 
@@ -81,9 +75,9 @@ class Valve:
             # Operation in progress
             cls.operate(cls.operation)
         if (device.Gpio.is_closed.isOff()):
-            if (value >= threshold["panic_value"]):
+            if (value >= poop.Poop.threshold["PANIC"]):
                 cls.operate('close')
         elif (device.Gpio.is_opened.isOff()):
-            if (value <= threshold["empty_value"]):
+            if (value <= poop.Poop.threshold["nominal"]):
                 cls.operate('open')
 

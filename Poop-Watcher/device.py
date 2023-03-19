@@ -14,12 +14,6 @@ import override
 import pager
 import poop
 
-interval = {
-    'sample': 1,
-    'heart': 2,
-    'status': 6,
-}
-
 class Gpio:
 
     def __init__(self, lcd, simulate = False):

@@ -23,6 +23,49 @@ class Poop:
         'status': 6,
     }
 
+    # A map of poop levels and what to do for each.
+    # Based on bench testing an inch equates to about 8 ticks on the ADC
+    # https://docs.google.com/document/d/1y9-7Vs1QebsVzuF8hXrv6W9YnSJAdl80ODEjWZSmrM8/
+    # This should be tuned after some real-world testing
+    hour = 3600
+    poopmap = [
+        {
+            'severity': 'empty',
+            'threshold': -1,            # Tune `nominal` so this only happens after a pump-out
+            'frequency': 7 * 24 * hour,
+        }, {
+            'severity': 'nominal',
+            'threshold': 320,           # 60 inches below 'PANIC' (5 feet) -- to be tuned
+            'frequency': 7 * 24 * hour,
+        }, {
+            'severity': 'High',
+            'threshold': 700,           # Should match the Classroom Red Light turning on
+            'frequency': 24 * hour,     # Wholly arbitrary before real-world tuning
+        }, {
+            'severity': 'URGENT',
+            'threshold': 800,           # 20 inches below sensor
+            'frequency': 4 * hour,      # Or maybe this should be the Red Light?
+        }, {
+            'severity': 'PANIC',        # This will trigger shutting off the water main valve
+            'threshold': 880,           # 10 inches below sensor
+            'frequency': 1 * hour,
+        }, {
+            'severity': 'placeholder9', # place holder to make the math easier
+            'threshold': 99999,         # should never be returned
+            'frequency': 1 * hour,      # but just in case...
+        }
+    ]
+
+    # Build a map indexed by threshold
+    # This is a public dictionary accessed directly (eg in valve.py)
+    threshold = dict()
+    for poop in poopmap:
+        threshold[poop["severity"]] = poop["threshold"]
+
+    poopmessage = "Poop level {}: {:1.0f}% ({:d}, {:3.2}v) Valve:{}"  # Poop level PANIC|URGENT|High|nominal: 93% (128, 4.12v) Valve:open|closed
+    last_poopalert = poopmap[0]
+    last_pooptime = 0
+
     # This ensures we run perSecond() only one at a time
     # Introduces the possibility that we miss seconds here and there if perSecond() blocks or takes longer than a second
     perSecond_lock = threading.Lock()
@@ -31,8 +74,32 @@ class Poop:
         pass
 
     @classmethod
+    def simulate_mode(cls):
+        """Override all alert frequencies and set to 10 seconds."""
+        for entry in cls.poopmap:
+            entry["frequency"] = 1
+
+    @classmethod
+    def poop_notify(cls, value, voltage, percent, valve, recip=None):
+        """Format and send poop message, throttled according to `frequency` defined in poopmap."""
+        now = int(time.time())
+
+        # Find approprate stanza
+        for p in range(len(cls.poopmap)):
+            if (value < cls.poopmap[p]["threshold"]):
+                alert = cls.poopmap[p-1]
+                break
+
+        elapsed = now - cls.last_pooptime
+
+        if ((p != cls.last_poopalert) or (elapsed > alert["frequency"])):
+            pager.Pager.send(cls.poopmessage.format(alert["severity"], percent, value, voltage, valve))
+            cls.last_poopalert = p
+            cls.last_pooptime = now
+
+    @classmethod
     def check(cls):
-        """Read the ADC and Do The Right Thing(tm) as regards the poop level."""
+        """Read the poop level from the ADC and Do The Right Thing(tm)."""
         value, voltage, percent = device.Gpio.adc.get_values()
         if (device.Gpio.is_opened.isOn()):
             valve_state = 'open'
@@ -40,7 +107,7 @@ class Poop:
             valve_state = 'closed'
         else:
             valve_state = 'midway'
-        pager.Pager.poop_notify(value, voltage, percent, valve_state)
+        cls.poop_notify(value, voltage, percent, valve_state)
         valve.Valve.maybeOperate(value)
 
     @classmethod
