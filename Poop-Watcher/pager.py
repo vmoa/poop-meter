@@ -16,6 +16,7 @@ class Pager:
     recip = None                            # Default recipient
     #client                                 # Twilio client; created in __init__()
     simulate = False                        # If set, simulate sending pages but don't actually send
+    reboot = True                           # Cleared after we send the first page
 
     def __init__(self, simulate=False):
         self.simulate_mode(simulate)
@@ -51,6 +52,9 @@ class Pager:
             recip = cls.recip  # Use default
         if ('twilio' in cls.config):
             if (recip in cls.config['recipient']):
+                if (cls.reboot):
+                    msg = 'Poop meter rebooted; ' + msg
+                    cls.reboot = False
                 if (cls.simulate):
                     prefix = 'Simulated page'
                 else:
