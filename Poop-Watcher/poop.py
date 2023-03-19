@@ -30,37 +30,53 @@ class Poop:
     hour = 3600
     poopmap = [
         {
-            'severity': 'empty',
+            'severity' : 'empty',
+            'color'    : 'green',
             'threshold': -1,            # Tune `nominal` so this only happens after a pump-out
             'frequency': 7 * 24 * hour,
         }, {
-            'severity': 'nominal',
+            'severity' : 'nominal',
+            'color'    : 'green',
             'threshold': 320,           # 60 inches below 'PANIC' (5 feet) -- to be tuned
             'frequency': 7 * 24 * hour,
         }, {
-            'severity': 'High',
+            'severity' : 'High',
+            'color'    : 'orange',
             'threshold': 700,           # Should match the Classroom Red Light turning on
             'frequency': 24 * hour,     # Wholly arbitrary before real-world tuning
         }, {
-            'severity': 'URGENT',
+            'severity' : 'URGENT',
+            'color'    : 'red',
             'threshold': 800,           # 20 inches below sensor
             'frequency': 4 * hour,      # Or maybe this should be the Red Light?
         }, {
-            'severity': 'PANIC',        # This will trigger shutting off the water main valve
+            'severity' : 'PANIC',        # This will trigger shutting off the water main valve
+            'color'    : 'red',
             'threshold': 880,           # 10 inches below sensor
             'frequency': 1 * hour,
         }, {
-            'severity': 'placeholder9', # place holder to make the math easier
+            'severity' : 'placeholder9', # place holder to make the math easier
+            'color'    : 'blue',
             'threshold': 99999,         # should never be returned
             'frequency': 1 * hour,      # but just in case...
         }
     ]
 
-    # Build a map indexed by threshold
+    # Build a dictionary indexed by threshold
     # This is a public dictionary accessed directly (eg in valve.py)
     threshold = dict()
     for poop in poopmap:
         threshold[poop["severity"]] = poop["threshold"]
+
+    # Build a list of poopmap entries indexed by poop level
+    # This trades off memory (1024 element list) for perfomance, since we look this up every second
+    # And requires that poopmap entries are sorted in increasing threshold order
+    mapidx = 0
+    poopmapArray = []
+    for thresh in range(0,1024):
+        if (thresh >= poopmap[mapidx+1]['threshold']):
+            mapidx += 1
+        poopmapArray.append(poopmap[mapidx])
 
     poopmessage = "Poop level {}: {:1.0f}% ({:d}, {:3.2}v) Valve:{}"  # Poop level PANIC|URGENT|High|nominal: 93% (128, 4.12v) Valve:open|closed
     last_poopalert = poopmap[0]
@@ -116,7 +132,11 @@ class Poop:
     def printStatus(cls):
         """Return a string with the formatted status."""
         poopLevel, poopVolts, poopPercent = device.Gpio.adc.get_values()
-        device.Gpio.lcd.printLine("{:3d}% {:4.2f}v {:4d}".format(int(poopPercent), poopVolts, int(poopLevel)), line=1)   # 100% 3.45v 1024
+
+        poopEntry = cls.poopmapArray[int(poopLevel)]                                                # LCD layout
+        device.Gpio.lcd.setColor(poopEntry["color"])                                                # ================ 
+        device.Gpio.lcd.printLine("Poop level {:d}%".format(int(poopPercent)), line=0)              # Poop level 100%
+        device.Gpio.lcd.printLine("  {:4.2f}v {:4d}".format(poopVolts, int(poopLevel)), line=1)     #   3.45v 1024   *
 
         status = "POOP:{pct:3.1f}%-{val}-{volt:3.2f}v ".format(pct=poopPercent, val=poopLevel, volt=poopVolts)
         for sensor in device.Gpio.Sensor.sensors:
