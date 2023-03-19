@@ -16,8 +16,8 @@ Requires=local-fs.target network.target
 [Service]
 Type=simple
 User=root
-ExecStart=/usr/local/bin/poopwatcher
-ExecStop=/usr/bin/pkill poopwatcher
+ExecStart=/usr/local/bin/poopWatcher
+ExecStop=/usr/bin/pkill poopWatcher
 Restart=always
 RestartSec=10
 
