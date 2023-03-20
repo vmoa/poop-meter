@@ -6,12 +6,12 @@ encoding utf-8
 Sheet 1 1
 Title "Poop Valve Controller"
 Date "2023-03-19"
-Rev "0.11 (draft)"
+Rev "1.0"
 Comp "Robert Ferguson Observatory"
-Comment1 "v0.8 reconfigure manual override; updated layout for clarity"
-Comment2 "v0.9 add override shunt and sense transistors "
-Comment3 "v0.10 add Master Override switch"
-Comment4 "v0.11 reconfigure 3.3v override relay drive"
+Comment1 "v0.9 add override shunt and sense transistors "
+Comment2 "v0.10 add Master Override switch"
+Comment3 "v0.11 reconfigure 3.3v override relay drive"
+Comment4 "v1.0 promote final draft to production"
 $EndDescr
 $Comp
 L Connector:Raspberry_Pi_2_3 J1
