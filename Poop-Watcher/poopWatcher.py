@@ -40,7 +40,7 @@ import poop
 import valve
 
 
-version = 'v1.0'        # Poop Watcher version
+version = 'v1.0.1'        # Poop Watcher version
 lockfile = 0            # Global so when we lock we keep it
 lockfilename = '/tmp/poop.lock'
 
@@ -105,6 +105,7 @@ if __name__ == '__main__':
     """Set up interrupts and a per-second callback, the pause forever"""
     args = initialize()
     poop.Poop.perSecond()
+    threading.Timer(3.0, poop.Poop.printStatus).start()  # Update the display in a few seconds
 
     if (args.test_mode):
         logging.info("Entering test mode")
