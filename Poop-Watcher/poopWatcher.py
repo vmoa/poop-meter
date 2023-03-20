@@ -1,14 +1,12 @@
+#!/usr/bin/python
 #
 # Manage the poop meter and water main vavle
-#   Reads serial data from Arduino, but also reads analog data from poop probe via SPI
-#   In this version, the Arduino data is canonical and SPI data is recorded for comparison
-#   Once we get corellation between Arduino and SPI data we switch to SPI and retire Arduino
+#   Reads analog voltage from poop probe via the ADC connected to the SPI bus and operates the remote valve
+#   to shut off the water main before the holding take is full.  Also sends SMS satatus notifications.
 #
-# Requires SPI for reading from the MCP3009 analog/digital converter
+# Requires SPI for reading from the MCP3008 analog/digital converter
 # Requires I2C for updating status on the the Grove LCD (https://wiki.seeedstudio.com/Grove-LCD_RGB_Backlight/)
 #   raspi-config --> interfacing --> {spi,i2c}
-#
-# The running user must be a member of groups gpio and spi
 #
 # We also use:
 #   gpiozero (https://gpiozero.readthedocs.io/en/stable/) pip3 install gpiozero rpi.gpio
@@ -19,8 +17,7 @@
 #
 #  sudo apt-get install python3-pigpio
 #
-# Set port permissions
-#   sudo chmod 666  /dev/i2c-1
+# Running user needs to be a member of groups: i2c, spi, gpio
 
 import argparse
 import datetime
@@ -35,21 +32,21 @@ import sys
 import threading
 from time import sleep
 
-import arduino
 import device
 import grove
+import override
 import pager
+import poop
 import valve
 
 
-version = 'v0.9.0'      # Poop Watcher version
-statusInterval = 60     # Seconds between status updates without input changes
+version = 'v0.9.4'      # Poop Watcher version
 lockfile = 0            # Global so when we lock we keep it
 lockfilename = '/tmp/poop.lock'
 
 def initialize():
     # Parse command line args
-    default_logfile = '/var/log/poop.log'   # TODO: change this to daily rotation from perl code
+    default_logfile = '/var/log/poop.log'   # TODO: change this to daily rotation
     parser = argparse.ArgumentParser(description='RFO Poop Tank (septic) controller.')
     parser.add_argument('--debug', dest='debug', action='store_true', help='include DEBUG messages in logs')
     parser.add_argument('--test-mode', dest='test_mode', action='store_true', help='enter test mode')
@@ -88,12 +85,13 @@ def initialize():
     # Initialize the Grove LCD
     lcd = grove.Grove()
     lcd.setRGB(0, 255, 255)  # cyan
-    lcd.setText("RFO Poop Meter\nVersion {}".format(version))
-    sleep(2)  # This should be an LCD freeze display option intead of a sleep
+    lcd.latentMessage("RFO Poop Meter\nVersion {}".format(version), 2)
 
     # Initialize devices
-    gpio = device.Gpio()
-    logging.info(device.printStatus())
+    gpio = device.Gpio(lcd = lcd)
+    poop.Poop.simulateMode(args.simulate)
+    override.Override.simulateMode(args.simulate)
+    logging.info(poop.Poop.printStatus())
 
     # Initialize pager
     mypager = pager.Pager(simulate = args.simulate)
@@ -106,7 +104,7 @@ def initialize():
 if __name__ == '__main__':
     """Set up interrupts and a per-second callback, the pause forever"""
     args = initialize()
-    device.perSecond()
+    poop.Poop.perSecond()
 
     if (args.test_mode):
         logging.info("Entering test mode")

@@ -16,8 +16,8 @@ Requires=local-fs.target network.target
 [Service]
 Type=simple
 User=root
-ExecStart=/usr/local/bin/poopwatcher
-ExecStop=/usr/bin/pkill poopwatcher
+ExecStart=/home/itadm/poop-meter/Poop-Watcher/poopWatcher.py
+ExecStop=/usr/bin/pkill poopWatcher
 Restart=always
 RestartSec=10
 

@@ -4,7 +4,10 @@
 
 import configparser
 import logging
+import time
 import twilio.rest
+
+import device
 
 class Pager:
 
@@ -13,6 +16,7 @@ class Pager:
     recip = None                            # Default recipient
     #client                                 # Twilio client; created in __init__()
     simulate = False                        # If set, simulate sending pages but don't actually send
+    reboot = True                           # Cleared after we send the first page
 
     def __init__(self, simulate=False):
         self.simulate_mode(simulate)
@@ -48,6 +52,9 @@ class Pager:
             recip = cls.recip  # Use default
         if ('twilio' in cls.config):
             if (recip in cls.config['recipient']):
+                if (cls.reboot):
+                    msg = 'Poop meter rebooted; ' + msg
+                    cls.reboot = False
                 if (cls.simulate):
                     prefix = 'Simulated page'
                 else:
@@ -62,7 +69,22 @@ class Pager:
         else:
             logging.error('Pager.send(): cannot send to {}: no Twilio config found'.format(recip))
 
+    #
+    # Generic-ish Twilio stuff above; poopy stuff below
+    #
+
+    # Message categories
+    lastSend = {}
+
     @classmethod
-    def notify(cls, msg, varags, recip=None):
-        """Format and send standard message according to defined schedule."""
-        pass
+    def notify_maybe(cls, cat, msg, recip=None):
+        """Send a categorical message <cat> with protection to prevent rapid duplication."""
+        now = int(time.time())
+        if (cat in lastSend):
+            elapsed = now - lastSend[cat]
+            if (elapsed > 10 * min):
+                cls.send(msg, recip)
+                lastSend[cat] = now
+        else:
+            cls.send(msg, recip)
+            lastSend[cat] = now
