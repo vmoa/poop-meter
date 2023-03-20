@@ -1,5 +1,5 @@
 #
-# Simple start/stop script for the RFO poopwatcher service
+# Simple start/stop script for the RFO poopWatcher service
 #
 # Place this file in /etc/systemd/system
 #	sudo mv poop.service /etc/systemd/system/
@@ -16,7 +16,7 @@ Requires=local-fs.target network.target
 [Service]
 Type=simple
 User=root
-ExecStart=/home/itadm/poop-meter/Poop-Watcher/poopWatcher.py
+ExecStart=/home/itadm/poop-meter/src/poopWatcher.py
 ExecStop=/usr/bin/pkill poopWatcher
 Restart=always
 RestartSec=10
