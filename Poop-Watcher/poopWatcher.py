@@ -9,11 +9,11 @@
 #   raspi-config --> interfacing --> {spi,i2c}
 #
 # We also use:
-#   gpiozero (https://gpiozero.readthedocs.io/en/stable/) pip3 install gpiozero rpi.gpio
-#   pySerial (https://pyserial.readthedocs.io/en/latest/) pip3 install pyserial
-#   Twilio helper (https://www.twilio.com/docs/libraries/python) pip3 install twilio
-#   MCP library (https://github.com/adafruit/Adafruit_CircuitPython_MCP3xxx/) pip3 install adafruit-circuitpython-mcp3xxx
-#   i2c smbus bindings (https://pypi.org/project/smbus/) pip3 install smbus
+#   gpiozero (https://gpiozero.readthedocs.io/en/stable/) sudo pip3 install gpiozero rpi.gpio
+#   pySerial (https://pyserial.readthedocs.io/en/latest/) sudo pip3 install pyserial
+#   Twilio helper (https://www.twilio.com/docs/libraries/python) sudo pip3 install twilio
+#   MCP library (https://github.com/adafruit/Adafruit_CircuitPython_MCP3xxx/) sudo pip3 install adafruit-circuitpython-mcp3xxx
+#   i2c smbus bindings (https://pypi.org/project/smbus/) sudo pip3 install smbus
 #
 #  sudo apt-get install python3-pigpio
 #
@@ -40,7 +40,7 @@ import poop
 import valve
 
 
-version = 'v0.9.4'      # Poop Watcher version
+version = 'v1.0'        # Poop Watcher version
 lockfile = 0            # Global so when we lock we keep it
 lockfilename = '/tmp/poop.lock'
 
