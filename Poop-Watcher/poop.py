@@ -20,7 +20,7 @@ class Poop:
     interval = {
         'sample': 1,
         'heart': 2,
-        'status': 6,
+        'status': 60,
     }
 
     # A map of poop levels and what to do for each.
