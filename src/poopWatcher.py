@@ -40,7 +40,7 @@ import poop
 import valve
 
 
-version = 'v1.0.1'        # Poop Watcher version
+version = 'v1.0.2'        # Poop Watcher version
 lockfile = 0            # Global so when we lock we keep it
 lockfilename = '/tmp/poop.lock'
 
@@ -80,7 +80,7 @@ def initialize():
     else:
         loggingConfig['filename'] = args.logfile if args.logfile else default_logfile;
     logging.basicConfig(**loggingConfig)
-    logging.info("Initializing poopWatcher {}".format(version))
+    logging.info("Initializing poopWatcher Version {}".format(version))
 
     # Initialize the Grove LCD
     lcd = grove.Grove()
