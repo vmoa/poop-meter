@@ -1,0 +1,1 @@
+*/10 * * * * rsync -av /var/log/poop.* votmoa@shell.sonic.net:poop/
