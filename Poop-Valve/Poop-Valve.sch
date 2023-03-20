@@ -3,15 +3,15 @@ EELAYER 30 0
 EELAYER END
 $Descr USLetter 11000 8500
 encoding utf-8
-Sheet 1 2
+Sheet 1 1
 Title "Poop Valve Controller"
-Date "2023-02-01"
-Rev "0.10 (draft)"
+Date "2023-03-19"
+Rev "0.11 (draft)"
 Comp "Robert Ferguson Observatory"
-Comment1 "v0.7 correct ADC sample wiring"
-Comment2 "v0.8 reconfigure manual override; updated layout for clarity"
-Comment3 "v0.9 add override shunt and sense transistors "
-Comment4 "v0.10 add Master Override switch"
+Comment1 "v0.8 reconfigure manual override; updated layout for clarity"
+Comment2 "v0.9 add override shunt and sense transistors "
+Comment3 "v0.10 add Master Override switch"
+Comment4 "v0.11 reconfigure 3.3v override relay drive"
 $EndDescr
 $Comp
 L Connector:Raspberry_Pi_2_3 J1
@@ -849,12 +849,12 @@ Wire Wire Line
 $Comp
 L power:+3.3V #PWR02
 U 1 1 64418208
-P 6450 5750
-F 0 "#PWR02" H 6450 5600 50  0001 C CNN
-F 1 "+3.3V" H 6465 5923 50  0000 C CNN
-F 2 "" H 6450 5750 50  0001 C CNN
-F 3 "" H 6450 5750 50  0001 C CNN
-	1    6450 5750
+P 6450 5600
+F 0 "#PWR02" H 6450 5450 50  0001 C CNN
+F 1 "+3.3V" H 6465 5773 50  0000 C CNN
+F 2 "" H 6450 5600 50  0001 C CNN
+F 3 "" H 6450 5600 50  0001 C CNN
+	1    6450 5600
 	1    0    0    -1  
 $EndComp
 NoConn ~ 7250 5850
@@ -1258,12 +1258,6 @@ Wire Wire Line
 	4700 2500 4800 2500
 Wire Wire Line
 	4950 3900 5200 3900
-$Sheet
-S 2050 8850 750  200 
-U 65DFE627
-F0 "Scratch" 50
-F1 "scratch.sch" 50
-$EndSheet
 Wire Wire Line
 	2100 4100 2100 7400
 Wire Wire Line
@@ -1340,8 +1334,8 @@ U 1 1 6627A51F
 P 5650 6250
 AR Path="/65DFE627/6627A51F" Ref="R?"  Part="1" 
 AR Path="/6627A51F" Ref="R10"  Part="1" 
-F 0 "R10" V 5443 6250 50  0000 C CNN
-F 1 "10k" V 5534 6250 50  0000 C CNN
+F 0 "R10" V 5550 6250 50  0000 C CNN
+F 1 "10k" V 5650 6250 50  0000 C CNN
 F 2 "" V 5580 6250 50  0001 C CNN
 F 3 "~" H 5650 6250 50  0001 C CNN
 	1    5650 6250
@@ -1382,57 +1376,36 @@ F 3 "~" H 7050 6050 50  0001 C CNN
 	1    7050 6050
 	1    0    0    1   
 $EndComp
-$Comp
-L Device:R R1
-U 1 1 664501BE
-P 5650 5850
-F 0 "R1" V 5443 5850 50  0000 C CNN
-F 1 "1000" V 5534 5850 50  0000 C CNN
-F 2 "" V 5580 5850 50  0001 C CNN
-F 3 "~" H 5650 5850 50  0001 C CNN
-	1    5650 5850
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	5800 6250 6050 6250
-Wire Wire Line
-	6450 5750 6450 5850
 Wire Wire Line
 	6450 6150 6600 6150
 Text Notes 4750 6450 0    50   ~ 0
 Ovr Shunt
-Connection ~ 5250 5850
-Wire Wire Line
-	5250 5850 5250 6050
-Connection ~ 6450 5850
-Wire Wire Line
-	6450 5850 6450 6150
-Wire Wire Line
-	5800 5850 6450 5850
 $Comp
 L Device:R R?
 U 1 1 6659FCFC
-P 6050 5300
+P 6050 5400
 AR Path="/65DFE627/6659FCFC" Ref="R?"  Part="1" 
 AR Path="/6659FCFC" Ref="R11"  Part="1" 
-F 0 "R11" H 5980 5346 50  0000 R CNN
-F 1 "10k" H 5980 5255 50  0000 R CNN
-F 2 "" V 5980 5300 50  0001 C CNN
-F 3 "~" H 6050 5300 50  0001 C CNN
-	1    6050 5300
+F 0 "R11" H 5980 5446 50  0000 R CNN
+F 1 "10k" H 5980 5355 50  0000 R CNN
+F 2 "" V 5980 5400 50  0001 C CNN
+F 3 "~" H 6050 5400 50  0001 C CNN
+	1    6050 5400
 	-1   0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR?
 U 1 1 6659FD02
-P 5650 5250
+P 5650 5350
 AR Path="/65DFE627/6659FD02" Ref="#PWR?"  Part="1" 
 AR Path="/6659FD02" Ref="#PWR022"  Part="1" 
-F 0 "#PWR022" H 5650 5000 50  0001 C CNN
-F 1 "GND" H 5655 5077 50  0000 C CNN
-F 2 "" H 5650 5250 50  0001 C CNN
-F 3 "" H 5650 5250 50  0001 C CNN
-	1    5650 5250
+F 0 "#PWR022" H 5650 5100 50  0001 C CNN
+F 1 "GND" H 5655 5177 50  0000 C CNN
+F 2 "" H 5650 5350 50  0001 C CNN
+F 3 "" H 5650 5350 50  0001 C CNN
+	1    5650 5350
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
@@ -1463,11 +1436,9 @@ Connection ~ 6050 6250
 Wire Wire Line
 	6050 6250 6600 6250
 Wire Wire Line
-	5950 5050 6050 5050
+	5950 5150 6050 5150
 Wire Wire Line
-	6050 5450 6050 6250
-Wire Wire Line
-	6050 5050 6050 5150
+	6050 5150 6050 5250
 Wire Wire Line
 	7800 5950 7800 6250
 Wire Wire Line
@@ -1498,23 +1469,21 @@ Wire Wire Line
 Wire Wire Line
 	4400 3700 4400 4000
 Connection ~ 4400 4000
-Text Notes 5750 4900 0    50   ~ 0
+Text Notes 5750 5000 0    50   ~ 0
 Ovr Sense
 $Comp
 L Device:Q_NPN_CBE Q?
 U 1 1 6659FCF6
-P 5750 5050
+P 5750 5150
 AR Path="/65DFE627/6659FCF6" Ref="Q?"  Part="1" 
 AR Path="/6659FCF6" Ref="Q2"  Part="1" 
-F 0 "Q2" H 5940 5096 50  0000 L CNN
-F 1 "2N2222" H 5940 5005 50  0000 L CNN
-F 2 "" H 5950 5150 50  0001 C CNN
-F 3 "~" H 5750 5050 50  0001 C CNN
-	1    5750 5050
+F 0 "Q2" H 5940 5196 50  0000 L CNN
+F 1 "2N2222" H 5940 5105 50  0000 L CNN
+F 2 "" H 5950 5250 50  0001 C CNN
+F 3 "~" H 5750 5150 50  0001 C CNN
+	1    5750 5150
 	-1   0    0    -1  
 $EndComp
-Wire Wire Line
-	5650 4650 5650 4850
 $Comp
 L Switch:SW_SPDT_SMALL SW?
 U 1 1 66A95683
@@ -1526,10 +1495,6 @@ F 3 "~" H 5150 4270 50  0001 C CNN
 	1    5200 4500
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	5250 4650 5250 5850
-Wire Wire Line
-	5500 5850 5250 5850
 Wire Wire Line
 	5200 4300 5200 3900
 Wire Wire Line
@@ -1579,10 +1544,41 @@ L Switch:SW_SPDT_SMALL SW2
 U 1 1 66A5A149
 P 5600 4500
 F 0 "SW2" V 5500 4650 50  0000 L CNN
-F 1 "Master Override" V 5600 4650 50  0000 L CNN
+F 1 "Emergency Override" V 5600 4650 50  0000 L CNN
 F 2 "" H 5550 4270 50  0001 C CNN
 F 3 "~" H 5550 4270 50  0001 C CNN
 	1    5600 4500
 	0    1    1    0   
 $EndComp
+Wire Wire Line
+	6050 5550 6050 6250
+Wire Wire Line
+	5650 4650 5650 4950
+Text Notes 5750 4650 0    50   ~ 0
+Operate
+Text Notes 4800 4650 0    50   ~ 0
+Override
+$Comp
+L Device:R R1
+U 1 1 664501BE
+P 5250 5900
+F 0 "R1" H 5350 5850 50  0000 C CNN
+F 1 "330" V 5250 5900 50  0000 C CNN
+F 2 "" V 5180 5900 50  0001 C CNN
+F 3 "~" H 5250 5900 50  0001 C CNN
+	1    5250 5900
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	5250 4650 5250 5700
+Wire Wire Line
+	6450 5600 6450 5700
+Wire Wire Line
+	5250 5700 6450 5700
+Connection ~ 5250 5700
+Wire Wire Line
+	5250 5700 5250 5750
+Connection ~ 6450 5700
+Wire Wire Line
+	6450 5700 6450 6150
 $EndSCHEMATC
