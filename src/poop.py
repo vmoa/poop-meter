@@ -96,6 +96,7 @@ class Poop:
             logging.info("Poop in simulate mode -- notifications sent every 10 seconds")
             for entry in cls.poopmap:
                 entry["frequency"] = 10
+            cls.interval["status"] = 1  # and update status every sample
 
     @classmethod
     def poop_notify(cls, value, voltage, percent, valve, recip=None):
