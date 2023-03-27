@@ -48,6 +48,7 @@ class Valve:
             if ((op == 'close' and device.Gpio.is_closed.isOn()) or (op == 'open' and device.Gpio.is_opened.isOn())):
                 logging.info("Valve.operate(): valve {}ed after {} seconds".format(op[0:4], elapsed))
                 device.Gpio.do_enable.turnOff()
+                device.Gpio.set_direction.turnOff()  # leave relay disengaged
                 cls.valveStartTime = 0
                 cls.operation = None
             else:
@@ -56,6 +57,7 @@ class Valve:
                     logging.error("Valve.operate(): {}".format(msg))
                     pager.Pager.send("WARNING: {}".format(msg))
                     device.Gpio.do_enable.turnOff()
+                    device.Gpio.set_direction.turnOff()  # leave relay disengaged
                     cls.valveStartTime = 0
                     cls.operation = None
 
