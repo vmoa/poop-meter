@@ -5,13 +5,13 @@ $Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title "Poop Valve Controller"
-Date "2023-03-19"
-Rev "1.0"
+Date "2023-04-19"
+Rev "1.1"
 Comp "Robert Ferguson Observatory"
-Comment1 "v0.9 add override shunt and sense transistors "
-Comment2 "v0.10 add Master Override switch"
-Comment3 "v0.11 reconfigure 3.3v override relay drive"
-Comment4 "v1.0 promote final draft to production"
+Comment1 "v0.10 add Master Override switch"
+Comment2 "v0.11 reconfigure 3.3v override relay drive"
+Comment3 "v1.0 promote final draft to production"
+Comment4 "v1.1 replace valve connector"
 $EndDescr
 $Comp
 L Connector:Raspberry_Pi_2_3 J1
@@ -78,17 +78,6 @@ F 2 "" H 7150 750 50  0001 C CNN
 F 3 "~" H 7150 750 50  0001 C CNN
 	1    7150 750 
 	-1   0    0    1   
-$EndComp
-$Comp
-L Connector:6P6C J2
-U 1 1 632E13D0
-P 1100 2150
-F 0 "J2" H 1157 2717 50  0000 C CNN
-F 1 "Valve" H 1157 2626 50  0000 C CNN
-F 2 "" V 1100 2175 50  0001 C CNN
-F 3 "~" V 1100 2175 50  0001 C CNN
-	1    1100 2150
-	1    0    0    -1  
 $EndComp
 $Comp
 L Connector:Conn_Coaxial_Power J3
@@ -287,44 +276,44 @@ $EndComp
 $Comp
 L Connector:Conn_01x04_Male J16
 U 1 1 6367843A
-P 10300 2400
-F 0 "J16" H 10350 2650 50  0000 R CNN
-F 1 "Grove LCD" H 10600 2100 50  0000 R CNN
-F 2 "" H 10300 2400 50  0001 C CNN
-F 3 "~" H 10300 2400 50  0001 C CNN
-	1    10300 2400
+P 10000 2400
+F 0 "J16" H 10050 2650 50  0000 R CNN
+F 1 "Grove LCD" H 10300 2100 50  0000 R CNN
+F 2 "" H 10000 2400 50  0001 C CNN
+F 3 "~" H 10000 2400 50  0001 C CNN
+	1    10000 2400
 	-1   0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR019
 U 1 1 636868F7
-P 9900 2700
-F 0 "#PWR019" H 9900 2450 50  0001 C CNN
-F 1 "GND" H 9905 2527 50  0000 C CNN
-F 2 "" H 9900 2700 50  0001 C CNN
-F 3 "" H 9900 2700 50  0001 C CNN
-	1    9900 2700
+P 9600 2700
+F 0 "#PWR019" H 9600 2450 50  0001 C CNN
+F 1 "GND" H 9605 2527 50  0000 C CNN
+F 2 "" H 9600 2700 50  0001 C CNN
+F 3 "" H 9600 2700 50  0001 C CNN
+	1    9600 2700
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:+5V #PWR020
 U 1 1 63687541
-P 10000 2200
-F 0 "#PWR020" H 10000 2050 50  0001 C CNN
-F 1 "+5V" H 10015 2373 50  0000 C CNN
-F 2 "" H 10000 2200 50  0001 C CNN
-F 3 "" H 10000 2200 50  0001 C CNN
-	1    10000 2200
+P 9700 2200
+F 0 "#PWR020" H 9700 2050 50  0001 C CNN
+F 1 "+5V" H 9715 2373 50  0000 C CNN
+F 2 "" H 9700 2200 50  0001 C CNN
+F 3 "" H 9700 2200 50  0001 C CNN
+	1    9700 2200
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	10100 2300 9900 2300
+	9800 2300 9600 2300
 Wire Wire Line
-	9900 2300 9900 2700
+	9600 2300 9600 2700
 Wire Wire Line
-	10100 2400 10000 2400
+	9800 2400 9700 2400
 Wire Wire Line
-	10000 2400 10000 2200
+	9700 2400 9700 2200
 $Comp
 L Device:R R5
 U 1 1 63696CF2
@@ -357,20 +346,11 @@ Wire Wire Line
 Wire Wire Line
 	3850 1950 4800 1950
 NoConn ~ 3350 4950
-Text Notes 1500 2350 0    50   ~ 0
-yellow
-Text Notes 1500 2250 0    50   ~ 0
-blue
-NoConn ~ 1500 2150
-Text Notes 1500 2050 0    50   ~ 0
-black
-Text Notes 1500 1950 0    50   ~ 0
-red
-Text Notes 1500 1850 0    50   ~ 0
-green
-Text Notes 2350 1350 0    50   ~ 0
+Text Notes 1500 1550 2    50   ~ 0
+black/white
+Text Notes 2200 1350 0    50   ~ 0
 Valve Opened
-Text Notes 2350 1550 0    50   ~ 0
+Text Notes 2200 1450 0    50   ~ 0
 Valve Closed
 Text Notes 6150 3300 0    50   ~ 0
 Sense Valve Open
@@ -515,10 +495,6 @@ Wire Wire Line
 	3200 6600 3200 5050
 Wire Wire Line
 	3200 5050 3350 5050
-Wire Wire Line
-	2950 6300 3350 6300
-Wire Wire Line
-	2950 6500 3350 6500
 Text Notes 6150 4000 0    50   ~ 0
 * GPIO26 logic:\n  Open is high\n  Close is low
 Wire Wire Line
@@ -561,10 +537,6 @@ Wire Wire Line
 	9700 5300 9550 5300
 Connection ~ 9700 5000
 Wire Wire Line
-	8450 2500 10100 2500
-Wire Wire Line
-	8450 2600 10100 2600
-Wire Wire Line
 	8450 3300 8850 3300
 Wire Wire Line
 	8850 3300 8850 4600
@@ -584,8 +556,8 @@ $Comp
 L Connector:Conn_01x05_Female J12
 U 1 1 639D2C62
 P 4750 3900
-F 0 "J12" H 4650 4250 50  0000 L CNN
-F 1 "Relays" H 4550 3600 50  0000 L CNN
+F 0 "J12" H 4600 3600 50  0000 L CNN
+F 1 "Relays" H 4600 4250 50  0000 L CNN
 F 2 "" H 4750 3900 50  0001 C CNN
 F 3 "~" H 4750 3900 50  0001 C CNN
 	1    4750 3900
@@ -650,36 +622,27 @@ Wire Wire Line
 Wire Wire Line
 	1150 7200 1150 7150
 Wire Wire Line
-	2950 6500 2950 7400
-Connection ~ 2950 6500
-Wire Wire Line
 	2700 7150 2700 7300
 Wire Wire Line
 	2700 7400 2700 7550
 Connection ~ 2700 7400
 Connection ~ 2700 7300
 Wire Wire Line
-	2950 6300 2950 6500
-Wire Wire Line
 	1750 7150 1750 7300
 Connection ~ 1750 7150
 Wire Wire Line
 	1750 7400 1750 7550
-Wire Wire Line
-	2250 7300 2500 7300
 Wire Wire Line
 	1750 7150 2250 7150
 Wire Wire Line
 	1750 7550 2250 7550
 Wire Wire Line
 	2250 7300 2250 7150
-Connection ~ 2250 7300
 Connection ~ 2250 7150
 Wire Wire Line
 	2250 7150 2700 7150
 Wire Wire Line
 	2250 7400 2250 7550
-Connection ~ 2250 7400
 Connection ~ 2250 7550
 Wire Wire Line
 	2250 7550 2700 7550
@@ -722,32 +685,9 @@ Text Notes 2350 4400 0    50   ~ 0
 Close
 Text Notes 2350 3650 0    50   ~ 0
 Open
-NoConn ~ 2600 1950
-$Comp
-L Connector:Conn_01x03_Male J10
-U 1 1 6466C078
-P 3250 1450
-F 0 "J10" H 3358 1731 50  0000 C CNN
-F 1 "Valve Sig" H 3358 1640 50  0000 C CNN
-F 2 "" H 3250 1450 50  0001 C CNN
-F 3 "~" H 3250 1450 50  0001 C CNN
-	1    3250 1450
-	1    0    0    -1  
-$EndComp
-NoConn ~ 3450 1450
-Wire Wire Line
-	1500 1850 2150 1850
-Wire Wire Line
-	2150 1850 2150 1350
 Wire Wire Line
 	2150 1350 3450 1350
 Connection ~ 3450 1350
-Wire Wire Line
-	1500 1950 2250 1950
-Wire Wire Line
-	2250 1950 2250 1550
-Wire Wire Line
-	2250 1550 3450 1550
 Connection ~ 3450 1550
 Wire Wire Line
 	7300 750  7300 850 
@@ -780,8 +720,6 @@ Wire Wire Line
 	3750 750  4000 750 
 Wire Wire Line
 	4000 950  3850 950 
-Text Notes 2350 2050 0    50   ~ 0
-+12V
 Connection ~ 4700 2150
 Wire Wire Line
 	2900 6100 3350 6100
@@ -797,14 +735,10 @@ Wire Wire Line
 Wire Wire Line
 	1750 7300 2000 7300
 Connection ~ 1750 7300
-Wire Wire Line
-	2250 7400 2550 7400
 Text Notes 1750 4400 0    50   ~ 0
 +12V
 Text Notes 2850 6100 0    50   ~ 0
 +12V
-Text Notes 3100 1450 0    50   ~ 0
-pin
 $Comp
 L Connector:Conn_01x06_Male J13
 U 1 1 64A6ADC2
@@ -954,12 +888,12 @@ Wire Wire Line
 Wire Wire Line
 	8850 6550 9550 6550
 Wire Wire Line
-	1150 7550 1750 7550
+	1150 7550 1650 7550
 Connection ~ 1750 7550
 Wire Wire Line
 	1150 7150 1300 7150
 Wire Wire Line
-	1500 7150 1750 7150
+	1500 7150 1650 7150
 Text Notes 8100 6350 0    50   ~ 0
 Phono
 Text Notes 9200 6350 0    50   ~ 0
@@ -1216,42 +1150,33 @@ Wire Wire Line
 Connection ~ 2000 4300
 Connection ~ 2100 4100
 Wire Wire Line
-	3200 2250 3200 4300
-Wire Wire Line
-	1500 2250 3200 2250
-Wire Wire Line
 	3200 4300 3350 4300
-Wire Wire Line
-	3100 2350 3100 3900
-Wire Wire Line
-	1500 2350 3100 2350
 Text Notes 1100 3850 0    50   ~ 0
 (open)-OFF-(close)
 $Comp
 L power:-12V #PWR06
 U 1 1 65B0B563
-P 4300 2200
-F 0 "#PWR06" H 4300 2300 50  0001 C CNN
-F 1 "-12V" H 4315 2373 50  0000 C CNN
-F 2 "" H 4300 2200 50  0001 C CNN
-F 3 "" H 4300 2200 50  0001 C CNN
-	1    4300 2200
+P 3850 2200
+F 0 "#PWR06" H 3850 2300 50  0001 C CNN
+F 1 "-12V" H 3865 2373 50  0000 C CNN
+F 2 "" H 3850 2200 50  0001 C CNN
+F 3 "" H 3850 2200 50  0001 C CNN
+	1    3850 2200
 	-1   0    0    1   
 $EndComp
 $Comp
 L power:-12V #PWR01
 U 1 1 65B2F214
-P 2700 7650
-F 0 "#PWR01" H 2700 7750 50  0001 C CNN
-F 1 "-12V" H 2715 7823 50  0000 C CNN
-F 2 "" H 2700 7650 50  0001 C CNN
-F 3 "" H 2700 7650 50  0001 C CNN
-	1    2700 7650
+P 1650 7650
+F 0 "#PWR01" H 1650 7750 50  0001 C CNN
+F 1 "-12V" H 1665 7823 50  0000 C CNN
+F 2 "" H 1650 7650 50  0001 C CNN
+F 3 "" H 1650 7650 50  0001 C CNN
+	1    1650 7650
 	-1   0    0    1   
 $EndComp
-Connection ~ 2700 7550
 Wire Wire Line
-	2700 7550 2700 7650
+	1650 7550 1650 7650
 Wire Wire Line
 	4700 2500 4700 2800
 Wire Wire Line
@@ -1263,27 +1188,9 @@ Wire Wire Line
 Wire Wire Line
 	2000 4300 2000 7300
 Wire Wire Line
-	2650 2050 2650 6950
-Wire Wire Line
-	2650 6950 2500 6950
-Wire Wire Line
-	2500 6950 2500 7300
-Wire Wire Line
-	1500 2050 2650 2050
-Wire Wire Line
-	2550 7400 2550 7000
-Wire Wire Line
-	2550 7000 2700 7000
-Wire Wire Line
-	2700 7000 2700 1950
-Wire Wire Line
-	2700 1950 2600 1950
-Wire Wire Line
 	2600 3800 3350 3800
 Wire Wire Line
 	2600 4200 3350 4200
-Wire Wire Line
-	2950 7400 2700 7400
 Wire Wire Line
 	4300 5350 4300 6100
 Wire Wire Line
@@ -1329,19 +1236,6 @@ F 3 "~" H 5350 6250 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Device:R R?
-U 1 1 6627A51F
-P 5650 6250
-AR Path="/65DFE627/6627A51F" Ref="R?"  Part="1" 
-AR Path="/6627A51F" Ref="R10"  Part="1" 
-F 0 "R10" V 5550 6250 50  0000 C CNN
-F 1 "10k" V 5650 6250 50  0000 C CNN
-F 2 "" V 5580 6250 50  0001 C CNN
-F 3 "~" H 5650 6250 50  0001 C CNN
-	1    5650 6250
-	0    -1   1    0   
-$EndComp
-$Comp
 L power:GND #PWR?
 U 1 1 6627A53E
 P 5250 6450
@@ -1376,8 +1270,6 @@ F 3 "~" H 7050 6050 50  0001 C CNN
 	1    7050 6050
 	1    0    0    1   
 $EndComp
-Wire Wire Line
-	5800 6250 6050 6250
 Wire Wire Line
 	6450 6150 6600 6150
 Text Notes 4750 6450 0    50   ~ 0
@@ -1423,9 +1315,7 @@ F 3 "" H 4550 2450 50  0001 C CNN
 $EndComp
 Connection ~ 4700 2500
 Wire Wire Line
-	4300 2150 4300 2200
-Wire Wire Line
-	4300 2150 4700 2150
+	3850 2150 3850 2200
 Wire Wire Line
 	4550 2450 4550 2500
 Wire Wire Line
@@ -1485,10 +1375,10 @@ F 3 "~" H 5750 5150 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Switch:SW_SPDT_SMALL SW?
+L Switch:SW_SPDT_SMALL SW4
 U 1 1 66A95683
 P 5200 4500
-F 0 "SW?" V 5129 4598 50  0001 L CNN
+F 0 "SW4" V 5129 4598 50  0001 L CNN
 F 1 "SW_SPDT_SMALL" V 5550 4100 50  0001 L CNN
 F 2 "" H 5150 4270 50  0001 C CNN
 F 3 "~" H 5150 4270 50  0001 C CNN
@@ -1505,10 +1395,10 @@ Wire Wire Line
 Wire Wire Line
 	5600 3150 6300 3150
 $Comp
-L power:GND #PWR?
+L power:GND #PWR026
 U 1 1 66BEBFAF
 P 5550 4650
-F 0 "#PWR?" H 5550 4400 50  0001 C CNN
+F 0 "#PWR026" H 5550 4400 50  0001 C CNN
 F 1 "GND" H 5555 4477 50  0000 C CNN
 F 2 "" H 5550 4650 50  0001 C CNN
 F 3 "" H 5550 4650 50  0001 C CNN
@@ -1516,10 +1406,10 @@ F 3 "" H 5550 4650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR025
 U 1 1 66BECFD3
 P 5150 4650
-F 0 "#PWR?" H 5150 4400 50  0001 C CNN
+F 0 "#PWR025" H 5150 4400 50  0001 C CNN
 F 1 "GND" H 5155 4477 50  0000 C CNN
 F 2 "" H 5150 4650 50  0001 C CNN
 F 3 "" H 5150 4650 50  0001 C CNN
@@ -1539,25 +1429,14 @@ F 3 "" H 5050 4150 50  0001 C CNN
 $EndComp
 Wire Notes Line
 	5200 4450 5600 4450
-$Comp
-L Switch:SW_SPDT_SMALL SW2
-U 1 1 66A5A149
-P 5600 4500
-F 0 "SW2" V 5500 4650 50  0000 L CNN
-F 1 "Emergency Override" V 5600 4650 50  0000 L CNN
-F 2 "" H 5550 4270 50  0001 C CNN
-F 3 "~" H 5550 4270 50  0001 C CNN
-	1    5600 4500
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	6050 5550 6050 6250
 Wire Wire Line
 	5650 4650 5650 4950
 Text Notes 5750 4650 0    50   ~ 0
-Operate
-Text Notes 4800 4650 0    50   ~ 0
-Override
+Run
+Text Notes 4950 4650 0    50   ~ 0
+Ovr
 $Comp
 L Device:R R1
 U 1 1 664501BE
@@ -1581,4 +1460,175 @@ Wire Wire Line
 Connection ~ 6450 5700
 Wire Wire Line
 	6450 5700 6450 6150
+$Comp
+L power:+12V #PWR023
+U 1 1 644D0E28
+P 1650 7050
+F 0 "#PWR023" H 1650 6900 50  0001 C CNN
+F 1 "+12V" H 1665 7223 50  0000 C CNN
+F 2 "" H 1650 7050 50  0001 C CNN
+F 3 "" H 1650 7050 50  0001 C CNN
+	1    1650 7050
+	1    0    0    -1  
+$EndComp
+Connection ~ 1650 7550
+Wire Wire Line
+	1650 7550 1750 7550
+Wire Wire Line
+	1650 7050 1650 7150
+Connection ~ 1650 7150
+Wire Wire Line
+	1650 7150 1750 7150
+$Comp
+L power:+12V #PWR024
+U 1 1 645219CB
+P 3600 1150
+F 0 "#PWR024" H 3600 1000 50  0001 C CNN
+F 1 "+12V" H 3615 1323 50  0000 C CNN
+F 2 "" H 3600 1150 50  0001 C CNN
+F 3 "" H 3600 1150 50  0001 C CNN
+	1    3600 1150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3450 1450 3600 1450
+Wire Wire Line
+	3600 1450 3600 1150
+$Comp
+L Connector:Conn_01x03_Male J10
+U 1 1 6466C078
+P 3250 1450
+F 0 "J10" H 3400 1650 50  0000 C CNN
+F 1 "O/C" H 3350 1250 50  0000 C CNN
+F 2 "" H 3250 1450 50  0001 C CNN
+F 3 "~" H 3250 1450 50  0001 C CNN
+	1    3250 1450
+	1    0    0    1   
+$EndComp
+Text Notes 3200 1450 2    50   ~ 0
+red
+Text Notes 3200 1350 2    50   ~ 0
+yellow
+Text Notes 3200 1550 2    50   ~ 0
+black
+$Comp
+L Connector:Conn_01x05_Male J17
+U 1 1 645FF66C
+P 1950 1550
+F 0 "J17" H 2050 2000 50  0000 C CNN
+F 1 "Valve" H 2000 1900 50  0000 C CNN
+F 2 "" H 1950 1550 50  0001 C CNN
+F 3 "~" H 1950 1550 50  0001 C CNN
+	1    1950 1550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2150 1450 2700 1450
+Wire Wire Line
+	3450 1450 2800 1450
+Wire Wire Line
+	2700 1550 2150 1550
+Connection ~ 3450 1450
+Wire Wire Line
+	2150 1650 3200 1650
+Wire Wire Line
+	2150 1750 3100 1750
+Wire Wire Line
+	2800 1450 2700 1550
+Wire Wire Line
+	2700 1450 2800 1550
+Wire Wire Line
+	2800 1550 3450 1550
+$Comp
+L Connector:Conn_01x05_Female J2
+U 1 1 647E58BA
+P 1750 1550
+F 0 "J2" H 1650 2000 50  0000 L CNN
+F 1 "Dongle" H 1500 1900 50  0000 L CNN
+F 2 "" H 1750 1550 50  0001 C CNN
+F 3 "~" H 1750 1550 50  0001 C CNN
+	1    1750 1550
+	1    0    0    -1  
+$EndComp
+Entry Wire Line
+	900  1250 1000 1350
+Entry Wire Line
+	900  1350 1000 1450
+Entry Wire Line
+	900  1450 1000 1550
+Entry Wire Line
+	900  1550 1000 1650
+Entry Wire Line
+	900  1650 1000 1750
+Wire Wire Line
+	1550 1350 1000 1350
+Wire Wire Line
+	1000 1450 1550 1450
+Wire Wire Line
+	1550 1550 1000 1550
+Wire Wire Line
+	1000 1650 1550 1650
+Wire Wire Line
+	1000 1750 1550 1750
+Text Notes 800  1000 0    50   ~ 0
+To valve
+Wire Wire Line
+	3200 1650 3200 4300
+Wire Wire Line
+	3100 1750 3100 3900
+Wire Wire Line
+	3000 6300 3000 6500
+Wire Wire Line
+	3000 6300 3350 6300
+Connection ~ 3000 6500
+Wire Wire Line
+	3000 6500 3350 6500
+Wire Wire Line
+	3000 6500 3000 7400
+Wire Wire Line
+	2700 7400 3000 7400
+Text Notes 1500 1750 2    50   ~ 0
+yellow
+Text Notes 1500 1650 2    50   ~ 0
+blue
+Text Notes 1500 1450 2    50   ~ 0
+red
+Text Notes 1500 1350 2    50   ~ 0
+green
+Wire Wire Line
+	5800 6250 6050 6250
+$Comp
+L Device:R R?
+U 1 1 6627A51F
+P 5650 6250
+AR Path="/65DFE627/6627A51F" Ref="R?"  Part="1" 
+AR Path="/6627A51F" Ref="R10"  Part="1" 
+F 0 "R10" V 5550 6250 50  0000 C CNN
+F 1 "10k" V 5650 6250 50  0000 C CNN
+F 2 "" V 5580 6250 50  0001 C CNN
+F 3 "~" H 5650 6250 50  0001 C CNN
+	1    5650 6250
+	0    -1   1    0   
+$EndComp
+$Comp
+L Switch:SW_SPDT_SMALL SW2
+U 1 1 66A5A149
+P 5600 4500
+F 0 "SW2" V 5400 4650 50  0001 L CNN
+F 1 "Emergency Override" V 5600 4650 50  0001 L CNN
+F 2 "" H 5550 4270 50  0001 C CNN
+F 3 "~" H 5550 4270 50  0001 C CNN
+	1    5600 4500
+	0    1    1    0   
+$EndComp
+Text Notes 5750 4500 0    50   ~ 0
+SW2\nEmergency\nOverride
+Wire Wire Line
+	3850 2150 4700 2150
+Wire Wire Line
+	8450 2500 9800 2500
+Wire Wire Line
+	8450 2600 9800 2600
+Wire Bus Line
+	900  1050 900  1650
 $EndSCHEMATC
