@@ -4,6 +4,11 @@
 
     Install with `sudo -u itadm crontab crontab.itadm`
 
+* grove.service
+
+    Service config to initialize the Grove LCD.  Installation instructions contained within.
+
 * poop.service
 
-    Service config. Installation instrucions contained within.
+    Service config for the poopWatcher. Installation instructions contained within.
+

@@ -1,3 +1,7 @@
+#!/usr/bin/python
+#
+# Initialize the Grove LCD.
+
 import time,sys
 
 if sys.platform == 'uwp':

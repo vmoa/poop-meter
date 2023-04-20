@@ -40,7 +40,9 @@ import poop
 import valve
 
 
-version = 'v1.0.2'        # Poop Watcher version
+version = 'v1.0.3'        # Poop Watcher version
+#version = output = os.popen('head -1 VERSION').read()
+
 lockfile = 0            # Global so when we lock we keep it
 lockfilename = '/tmp/poop.lock'
 

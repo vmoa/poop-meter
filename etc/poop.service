@@ -15,7 +15,7 @@
 [Unit]
 Description=RFO Poop Watcher Service
 After=local-fs.target network.target remote-fs.target
-Requires=local-fs.target network.target
+Requires=local-fs.target network.target grove.service
 
 [Service]
 Type=simple
