@@ -1,0 +1,18 @@
+v1.0.3
+
+# Leave the first line exactly the version number; it will be read by poopWatcher (someday)
+
+v1.0.3: Thu Apr 20 15:07:28 2023 +0100
+
+    added grove.service to reset Grove LCD before starting poop.service
+    update status every second if in simulate mode
+    disengage direction relay after operation
+    added crontab and cleaned up installation instructions
+
+v1.0.2: Mon Mar 20 14:02:00 2023 +0000
+
+    refactored source tree
+    add reference code for MCP3xxx ADC and Grove LCD
+    start a timer to update the display shortly after restart
+
+v1.0: Mon Mar 20 01:06:26 2023 +0000
