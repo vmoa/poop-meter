@@ -4,6 +4,7 @@ v1.0.3
 
 v1.0.3: Thu Apr 20 15:07:28 2023 +0100
 
+    updated schematic to replace valve connector (v1.1)
     added grove.service to reset Grove LCD before starting poop.service
     update status every second if in simulate mode
     disengage direction relay after operation
