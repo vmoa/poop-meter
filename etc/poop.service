@@ -15,12 +15,13 @@
 [Unit]
 Description=RFO Poop Watcher Service
 After=local-fs.target network.target remote-fs.target
-Requires=local-fs.target network.target grove.service
+Requires=local-fs.target network.target
 
 [Service]
 Type=simple
 User=root
 WorkingDirectory=/home/itadm/poop-meter
+ExecStartPre=/home/itadm/poop-meter/src/grove-reset.py
 ExecStart=/home/itadm/poop-meter/src/poopWatcher.py
 ExecStop=/usr/bin/pkill poopWatcher
 Restart=always
