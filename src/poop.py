@@ -4,6 +4,7 @@
 
 import datetime
 import logging
+import os
 import threading
 import time
 
@@ -21,6 +22,7 @@ class Poop:
         'sample': 1,
         'heart': 2,
         'status': 60,
+        'syscheck': 600,
     }
 
     # A map of poop levels and what to do for each.
@@ -153,6 +155,12 @@ class Poop:
         return(status)
 
     @classmethod
+    def syscheck(cls):
+        """Check system stuff infrequently."""
+        if (os.path.exists("nopage")):
+            logging.warning("Sentinel file 'nopage' file found -- pages are NOT being sent!")
+
+    @classmethod
     def perSecond(cls):
         """Callback that runs every second to perform housekeeping duties"""
         with cls.perSecond_lock:
@@ -165,6 +173,8 @@ class Poop:
                 device.Gpio.beatHeart(device.Gpio.heart.device)
             if (now % cls.interval['status'] == 0):
                 logging.info(Poop.printStatus())
+            if (now % cls.interval['syscheck'] == 0):
+                cls.syscheck()
 
             cls.check()
 

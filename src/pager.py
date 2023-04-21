@@ -4,6 +4,7 @@
 
 import configparser
 import logging
+import os
 import time
 import twilio.rest
 
@@ -55,7 +56,7 @@ class Pager:
                 if (cls.reboot):
                     msg = 'Poop meter rebooted; ' + msg
                     cls.reboot = False
-                if (cls.simulate):
+                if (cls.simulate or os.path.exists("nopage")):
                     prefix = 'Simulated page'
                 else:
                     prefix = 'Page'

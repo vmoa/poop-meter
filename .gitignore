@@ -2,6 +2,8 @@
 ############
 twilio.conf
 __pycache__
+.nopage
+nopage
 
 # Kicad dregs #
 ###############

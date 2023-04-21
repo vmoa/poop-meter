@@ -40,8 +40,8 @@ import poop
 import valve
 
 
-version = 'v1.0.3'        # Poop Watcher version
-#version = output = os.popen('head -1 VERSION').read()
+# Pull version from first line of VERSION file
+version = os.popen('head -1 VERSION').read()[0:-1]
 
 lockfile = 0            # Global so when we lock we keep it
 lockfilename = '/tmp/poop.lock'
@@ -83,6 +83,7 @@ def initialize():
         loggingConfig['filename'] = args.logfile if args.logfile else default_logfile;
     logging.basicConfig(**loggingConfig)
     logging.info("Initializing poopWatcher Version {}".format(version))
+    logging.info("Working directory: {}".format(os.popen('pwd').read()[0:-1]))
 
     # Initialize the Grove LCD
     lcd = grove.Grove()
@@ -106,6 +107,7 @@ def initialize():
 if __name__ == '__main__':
     """Set up interrupts and a per-second callback, the pause forever"""
     args = initialize()
+    poop.Poop.syscheck()
     poop.Poop.perSecond()
     threading.Timer(3.0, poop.Poop.printStatus).start()  # Update the display in a few seconds
 
