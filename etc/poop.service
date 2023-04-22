@@ -23,7 +23,7 @@ User=root
 WorkingDirectory=/home/itadm/poop-meter
 ExecStartPre=/home/itadm/poop-meter/src/grove-reset.py
 ExecStart=/home/itadm/poop-meter/src/poopWatcher.py
-ExecStop=/usr/bin/pkill poopWatcher
+ExecStopPost=/home/itadm/poop-meter/src/grove-reset.py Good-bye, cruel world
 Restart=always
 RestartSec=10
 
