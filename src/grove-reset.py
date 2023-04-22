@@ -79,6 +79,9 @@ def setText_norefresh(text):
 
 # example code
 if __name__=="__main__":
-    setText("Hello world\nResetting LCD")
-    setRGB(0,128,64)
+    if (len(sys.argv) > 1):
+        setText(" ".join(sys.argv[1:]))
+    else:
+        setText("Hello world\nResetting LCD")
+    setRGB(204,102,153)
 
