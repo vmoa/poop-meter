@@ -17,12 +17,12 @@ import pager
 # Thoughts on Hard / Soft Override Mode
 
 ## Soft Override Mode
-    Enter by holding momentary button for XX seconds
-    Exit by pressing momentary for XX seconds
+    Enter by holding momentary button for XX seconds and then releasing
+    Exit by pressing momentary for XX seconds then releasing
     Restart/reboot restores normal operation
     PANIC level will restore normal operation
 ## Hard Override Mode
-    Enter by toggling Emergency Override inside box; detect by Override low for > YY seconds
+    Enter by toggling Emergency Override inside box; detect by Override low
     Can only be exitied by user restoring Emergency Override switch
     Restart/reboot RETAINS Hard Override because it's a hardware switch
 
@@ -45,10 +45,13 @@ HARD    yes     d/c             -
 
 class Override:
 
-    interval = {
-        'soft': 30,
-        'hard': 120,
-    }
+    mode = 'none'           # The state of manual override (none, soft, SOFT, HARD)
+    manualOverrideStartTime = None # The time the button or switch was pressed
+
+    interval = {            # The length of time the override switch is 'on' to detect mode
+        'soft': 10,         # Triggers mode=`soft`, which will become `SOFT` if released before interval[hard]
+        'hard': 120,        # This is long enough that we assume the internal switch has been thrown
+    }                       # Note that interval[soft] is also used to cancel SOFT override
 
     initialNotifySec = 300      # Seconds before sending first page about manual override (5 minutes grace)
     repeatNotifySec = 86400     # Seconds between subsequent pages about manual override (daily)
@@ -56,6 +59,7 @@ class Override:
     startTime = 0           # Time override detected
     notifyNext = 0          # Time for next notification
     notifySent = False      # Whether we sent a notification or not
+
 
     def __init__(self):
         pass
@@ -87,44 +91,44 @@ class Override:
 
         if (device.Gpio.is_override.isOn()):
             now = time.time()
-            if (!cls.overrideStartTime):
-                cls.overrideStartTime = now
-            elapsed = cls.overrideStartTime - now
+            if (cls.manualOverrideStartTime == None):
+                cls.manualOverrideStartTime = now
+            elapsed = cls.manualOverrideStartTime - now
 
-            match cls.mode:
-                case "none":
-                    if (elapsed < cls.modeTime["soft"]):
-                        pass
-                    elif (elapsed < cls.modeTime["hard"]):
-                        cls.mode = 'soft'
-                        logging.debug("override.detectMode() ==> soft after {} seconds".format(elapsed))
-                    else:
-                        cls.mode = 'HARD'
-                        logging.debug("override.detectMode() ==> HARD* after {} seconds".format(elapsed))
-
-                case "soft":
-                    if (elapsed < cls.modeTime["hard"]):
-                        pass
-                    else:
-                        cls.mode = 'HARD'
-                        logging.debug("override.detectMode() ==> HARD after {} seconds".format(elapsed))
-
-                case "SOFT":
+            # Boo: match/case comes with Python 3.10 and we're stuck with 3.5
+            if (cls.mode == 'none'):
+                if (elapsed < cls.modeTime["soft"]):
                     pass
+                elif (elapsed < cls.modeTime["hard"]):
+                    cls.mode = 'soft'
+                    logging.debug("override.detectMode() ==> soft after {} seconds".format(elapsed))
+                else:
+                    cls.mode = 'HARD'
+                    logging.debug("override.detectMode() ==> HARD* after {} seconds".format(elapsed))
 
-                case "HARD":
+            elif (cls.mode == 'soft'):
+                if (elapsed < cls.modeTime["hard"]):
                     pass
+                else:
+                    cls.mode = 'HARD'
+                    logging.debug("override.detectMode() ==> HARD after {} seconds".format(elapsed))
 
-        else  # device.Gpio.is_override.isOff()
+            elif (cls.mode == 'SOFT'):
+                pass
+
+            elif (cls.mode == 'HARD'):
+                pass
+
+        else:  # device.Gpio.is_override.isOff()
             if (cls.overrideStartTime):
-                elapsed = cls.overrideStartTime - time.time()
-                if (cls.mode = 'soft'):
+                elapsed = cls.manualOverrideStartTime - time.time()
+                if (cls.mode == 'soft'):
                     cls.mode = 'SOFT'
                     logging.debug("override.detectMode() ==> SOFT after {} seconds".format(elapsed))
-                elif (cls.mode = 'HARD' or cls.mode = 'SOFT'):
+                elif (cls.mode == 'HARD' or cls.mode == 'SOFT'):
                     cls.mode = 'none'
                     logging.debug("override.detectMode() ==> none after {} seconds".format(elapsed))
-                cls.overrideStartTime = None
+                cls.manualOverrideStartTime = None
 
 
     @classmethod
