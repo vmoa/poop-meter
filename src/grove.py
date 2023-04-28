@@ -26,6 +26,8 @@ class Grove:
     LINE0 = 0x80
     LINE1 = 0xC0
 
+    debug = False
+
     def __init(self):
         logging.debug("grove.init()")
 
@@ -46,13 +48,18 @@ class Grove:
         time.sleep(.05)
 
     @classmethod
+    def setDebug(cls):
+        logging.debug("DEBUG: Enabling grove debugging")
+        cls.debug = True
+
+    @classmethod
     def setRGB(self, r, g, b):
         """Set backlight color (values from 0..255 for each)."""
         now = int(time.time())
         if (now <= self.printOK):
             return
         with self.grove_lock:
-            logging.debug("grove.setRGB({},{},{})".format(r,g,b))
+            self.debug and logging.debug("grove.setRGB({},{},{})".format(r,g,b))
             self.bus.write_byte_data(self.DISPLAY_RGB_ADDR, 0, 0)
             self.bus.write_byte_data(self.DISPLAY_RGB_ADDR, 1, 0)
             self.bus.write_byte_data(self.DISPLAY_RGB_ADDR, 0x08, 0xaa)
@@ -84,13 +91,13 @@ class Grove:
     def sendCommand(self, cmd):
         """Send command to display."""
         with self.grove_lock:
-            logging.debug("grove.sendCommand({})".format(cmd))
+            self.debug and logging.debug("grove.sendCommand({})".format(cmd))
             self.bus.write_byte_data(self.DISPLAY_TEXT_ADDR, 0x80, cmd)
 
     @classmethod
     def setText(self, text):
         """Set display text with wrapping and \n support."""
-        logging.debug("grove.setText({})".format(text))
+        self.debug and logging.debug("grove.setText({})".format(text))
         self.sendCommand(0x01) # clear display
         time.sleep(.05)
         self.setText_norefresh(text)
@@ -98,7 +105,7 @@ class Grove:
     @classmethod
     def setText_norefresh(self, text):
         """Update the display without erasing the display."""
-        logging.debug("grove.setText_norefresh({})".format(text))
+        self.debug and logging.debug("grove.setText_norefresh({})".format(text))
         self.sendCommand(0x02) # return home
         time.sleep(.05)
         while len(text) < 32: #clears the rest of the screen
@@ -120,7 +127,7 @@ class Grove:
     @classmethod
     def selectLine(self, line):
         """Select which line to update next."""
-        logging.debug("grove.selectLine({})".format(line))
+        self.debug and logging.debug("grove.selectLine({})".format(line))
         if (line == 0):
             self.sendCommand(0x80)
         else:
@@ -129,7 +136,7 @@ class Grove:
 
     @classmethod
     def setCursor(self, row, col):
-        logging.debug("grove.setCursor({},{})".format(row,col))
+        self.debug and logging.debug("grove.setCursor({},{})".format(row,col))
         if (col < 0):
             col = 0
         if (col > 15):
@@ -143,7 +150,7 @@ class Grove:
     @classmethod
     def clearLine(self, line=0):
         """Clear the current (or specified) line."""
-        logging.debug("grove.clearLine({})".format(line))
+        self.debug and logging.debug("grove.clearLine({})".format(line))
         if (line > 0):
             self.selectLine(line)
         self.setText(' '*16)
@@ -156,7 +163,7 @@ class Grove:
     @classmethod
     def printLine(self, text, line=-1):
         """Set text on current (or specified) line and truncate to EOL. Lines are numbered 0 and 1."""
-        logging.debug("grove.printLine({},{})".format(text,line))
+        self.debug and logging.debug("grove.printLine({},{})".format(text,line))
         now = int(time.time())
         if (now <= self.printOK):
             return

@@ -50,7 +50,7 @@ def initialize():
     # Parse command line args
     default_logfile = '/var/log/poop.log'   # TODO: change this to daily rotation
     parser = argparse.ArgumentParser(description='RFO Poop Tank (septic) controller.')
-    parser.add_argument('--debug', dest='debug', action='store_true', help='include DEBUG messages in logs')
+    parser.add_argument('--debug', dest='module', action='append', help='log debugging messages for module')
     parser.add_argument('--test-mode', dest='test_mode', action='store_true', help='enter test mode')
     parser.add_argument('--simulate', dest='simulate', action='store_true', help='simulate (do not send) pages')
     parser.add_argument('--log-file', '-L', dest='logfile', action='store', help='log filename (default {})'.format(default_logfile))
@@ -72,18 +72,30 @@ def initialize():
     lockfile.write("{}\n".format(os.getpid()))
     lockfile.flush()
 
+    print ("Logfile: {}".format(args.logfile))
     # Set up logging
     loggingConfig = dict(
         format = "%(asctime)s [%(levelname)s] %(message)s",
         datefmt = "%Y-%m-%d %H:%M:%S",
-        level = logging.DEBUG if (args.debug) else logging.INFO)
+        level = logging.DEBUG if (args.module) else logging.INFO)
     if (sys.stdin.isatty() and not args.logfile):
         print("TTY detected; logging to stderr")
     else:
         loggingConfig['filename'] = args.logfile if args.logfile else default_logfile;
+    print(loggingConfig)
     logging.basicConfig(**loggingConfig)
     logging.info("Initializing poopWatcher Version {}".format(version))
     logging.info("Working directory: {}".format(os.popen('pwd').read()[0:-1]))
+
+    # Enable module specific debugging
+    if (args.module):
+        for mod in args.module:
+            if (mod == 'grove'):
+                grove.Grove.setDebug()
+            elif (mod == 'override'):
+                override.Override.setDebug()
+            else:
+                logging.error("Debug module {} unknown; ignored".format(mod))
 
     # Initialize the Grove LCD
     lcd = grove.Grove()

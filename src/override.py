@@ -60,6 +60,8 @@ class Override:
     notifyNext = 0          # Time for next notification
     notifySent = False      # Whether we sent a notification or not
 
+    debug = False
+
 
     def __init__(self):
         pass
@@ -70,6 +72,11 @@ class Override:
             logging.info("Override in simulate mode -- notifications sent every 10 seconds")
             cls.initialNotifySec = 10
             cls.repeatNotifySec = 10
+
+    @classmethod
+    def setDebug(cls):
+        logging.debug("DEBUG: Enabling override debugging")
+        cls.debug = True
 
     @classmethod
     def detectMode(cls):
@@ -101,17 +108,17 @@ class Override:
                     pass
                 elif (elapsed < cls.modeTime["hard"]):
                     cls.mode = 'soft'
-                    logging.debug("override.detectMode() ==> soft after {} seconds".format(elapsed))
+                    cls.debug and logging.debug("override.detectMode() ==> soft after {} seconds".format(elapsed))
                 else:
                     cls.mode = 'HARD'
-                    logging.debug("override.detectMode() ==> HARD* after {} seconds".format(elapsed))
+                    cls.debug and logging.debug("override.detectMode() ==> HARD* after {} seconds".format(elapsed))
 
             elif (cls.mode == 'soft'):
                 if (elapsed < cls.modeTime["hard"]):
                     pass
                 else:
                     cls.mode = 'HARD'
-                    logging.debug("override.detectMode() ==> HARD after {} seconds".format(elapsed))
+                    cls.debug and logging.debug("override.detectMode() ==> HARD after {} seconds".format(elapsed))
 
             elif (cls.mode == 'SOFT'):
                 pass
@@ -124,10 +131,10 @@ class Override:
                 elapsed = cls.manualOverrideStartTime - time.time()
                 if (cls.mode == 'soft'):
                     cls.mode = 'SOFT'
-                    logging.debug("override.detectMode() ==> SOFT after {} seconds".format(elapsed))
+                    cls.debug and logging.debug("override.detectMode() ==> SOFT after {} seconds".format(elapsed))
                 elif (cls.mode == 'HARD' or cls.mode == 'SOFT'):
                     cls.mode = 'none'
-                    logging.debug("override.detectMode() ==> none after {} seconds".format(elapsed))
+                    cls.debug and logging.debug("override.detectMode() ==> none after {} seconds".format(elapsed))
                 cls.manualOverrideStartTime = None
 
 
