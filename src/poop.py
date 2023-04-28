@@ -11,6 +11,7 @@ import time
 import adc
 import device
 import grove
+import override
 import pager
 import valve
 
@@ -131,13 +132,27 @@ class Poop:
         cls.poop_notify(value, voltage, percent, valve_state)
         valve.Valve.maybeOperate(value)
 
+    colorIterator = 0;
+    overrideColors = [ 'indigo', 'red' ]
+
     @classmethod
     def printStatus(cls):
-        """Return a string with the formatted status."""
+        """Update display and return a string with the formatted status."""
         poopLevel, poopVolts, poopPercent = device.Gpio.adc.get_values()
+        overrideMode = override.Override.mode;
 
-        poopEntry = cls.poopmapArray[int(poopLevel)]                                                # LCD layout
-        device.Gpio.lcd.setColor(poopEntry["color"])                                                # ================ 
+        poopEntry = cls.poopmapArray[int(poopLevel)]
+        poopColor = poopEntry["color"]
+
+        if (overrideMode == 'none'):
+            pass
+        elif (poopColor == 'red'):
+            poopColor = cls.overrideColors[cls.colorIterator]
+            cls.colorIterator = not cls.colorIterator
+        else:
+            poopColor = cls.overrideColors[0]
+
+        device.Gpio.lcd.setColor(poopColor)
         device.Gpio.lcd.printLine("Poop level {:d}%".format(int(poopPercent)), line=0)              # Poop level 100%
         device.Gpio.lcd.printLine("  {:4.2f}v {:4d}".format(poopVolts, int(poopLevel)), line=1)     #   3.45v 1024   *
 
