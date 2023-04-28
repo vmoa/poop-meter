@@ -11,6 +11,7 @@ import adc
 import device
 import grove
 import pager
+import poop
 
 
 """
@@ -50,6 +51,7 @@ class Override:
 
     mode = 'none'           # The state of manual override (none, soft, SOFT, HARD)
     startTime = None        # The time the button or switch was pressed
+    modeStartTime = None        # The time we entered the particular mode (for alerting purposes)
     notifyNext = None       # Time for next notification
 
     interval = {            # The length of time the override switch is 'on' to detect mode
@@ -82,16 +84,19 @@ class Override:
         cls.debug and logging.debug("Override mode ==> {} after {} seconds".format(mode, int(elapsed)))
 
         if (mode == 'none'):
-            msg = "Manual override disabled after {}".format(datetime.timedelta(seconds=int(time.time() - cls.startTime)))
+            msg = "Manual override disabled after {}".format(datetime.timedelta(seconds=int(time.time() - cls.modeStartTime)))
             logging.warning(msg)
             pager.Pager.send(msg)
             cls.notifyNext = None
+            cls.modeStartTime = None
         elif (mode == 'soft'):
-            pass  # Transitory state; we'll notify when we go `SOFT`
+            pass
         else:
             msg = "Manual override enabled ({}); will notify in {} seconds if still set".format(mode, cls.interval['notify1'])
             logging.warning(msg)
             cls.notifyNext = time.time() + cls.interval['notify1']
+
+        logging.info(poop.Poop.printStatus())
 
     @classmethod
     def check(cls):
@@ -101,6 +106,7 @@ class Override:
         if (device.Gpio.is_override.isOn()):
             if (cls.startTime == None):
                 cls.startTime = now
+                cls.modeStartTime = cls.startTime
             elapsed = now - cls.startTime
 
             False and cls.debug and logging.debug("check(): mode:{} elapsed:{} startTime:{}".
@@ -140,6 +146,7 @@ class Override:
                 elif (cls.mode == 'HARD' or cls.mode == 'SOFT'):
                     cls.mode = 'none'
                     cls.logIt(cls.mode, elapsed)
+                    cls.modeStartTime = None
                 cls.startTime = None
 
         # Send override notification if it's time
