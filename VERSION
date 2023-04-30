@@ -1,6 +1,15 @@
-v1.0.4rc3
+v1.0.4
 
-# Leave the first line exactly the version number; it will be read by poopWatcher (someday)
+# Leave the first line exactly the version number; it will be read by poopWatcher
+
+v1.0.4: Sun 30 Apr 16:25:15 PDT 2023
+
+    calibrate threshold based on bench testing
+    implement override mode (instead of just override button)
+    add module specific debugging
+    moved grove init functionality into poop.service; deprecate grove.service
+    add support for `nopage` sentinel file
+    move version to VERSION file (this file)
 
 v1.0.3: Thu Apr 20 15:07:28 2023 +0100
 
@@ -17,3 +26,6 @@ v1.0.2: Mon Mar 20 14:02:00 2023 +0000
     start a timer to update the display shortly after restart
 
 v1.0: Mon Mar 20 01:06:26 2023 +0000
+
+Use commit history (`git log`) for details before v1.0
+
