@@ -65,10 +65,15 @@ class Valve:
     def maybeOperate(cls, value):
         """Open or close the valve if threshold conditions are met."""
 
+        # PANIC cancels a soft override
+        if (value >= poop.Poop.threshold["PANIC"] and override.Override.getMode() in {'soft', 'SOFT'}):
+            override.Override.cancelMode("Poop level is PANIC")
+            overrideMode = override.Override.getMode()
+
         # We can't do anything if manual override is set
-        if (override.Override.check()):
+        if (override.Override.isOverride()):
             if (cls.operation):
-                logging.warning("Manual override interrupted valve {}! Cancelling operation.".format(cls.operation))
+                logging.warning("Manual override ({}) interrupted valve {}! Cancelling operation.".format(override.Override.getMode(), cls.operation))
                 cls.operation = None
                 cls.valveStartTime = 0
             return

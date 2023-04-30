@@ -51,7 +51,7 @@ class Override:
 
     mode = 'none'           # The state of manual override (none, soft, SOFT, HARD)
     startTime = None        # The time the button or switch was pressed
-    modeStartTime = None        # The time we entered the particular mode (for alerting purposes)
+    modeStartTime = None    # The time we entered the particular mode (for alerting purposes)
     notifyNext = None       # Time for next notification
 
     interval = {            # The length of time the override switch is 'on' to detect mode
@@ -89,6 +89,20 @@ class Override:
     @classmethod
     def getMode(cls):
         return(cls.mode)
+
+    @classmethod
+    def cancelMode(cls, message):
+        """Forcibly cancel override mode. Will only work for soft modes."""
+        if (cls.mode in {'HARD', 'none'}):
+            logging.warning("Attempt to cancel {} override ignored".format(cls.mode))
+        else:
+            msg = "Forcibly cancelling {} override: {}".format(cls.mode, message)
+            logging.warning(msg)
+            pager.Pager.send(msg)
+            cls.mode = 'none'
+            cls.startTime = None
+            cls.modeStartTime = None
+            cls.notifyNext = None
 
     @classmethod
     def logIt(cls, mode, elapsed):
@@ -153,7 +167,7 @@ class Override:
                 if (cls.mode == 'soft'):
                     cls.mode = 'SOFT'
                     cls.logIt(cls.mode, elapsed)
-                elif (cls.mode == 'HARD' or cls.mode == 'SOFT'):
+                elif (cls.mode in {'HARD', 'SOFT'}):
                     cls.mode = 'none'
                     cls.logIt(cls.mode, elapsed)
                     cls.notifyNext = None
@@ -162,7 +176,10 @@ class Override:
 
         # Send override notification if it's time
         if (cls.notifyNext and now >= cls.notifyNext):
-            pager.Pager.send("WARNING: manual override ({}) has been enabled for {}; poop valve operation suspended"
-                       .format(cls.mode, datetime.timedelta(seconds=int(now - cls.modeStartTime))))
+            suspendNotice = ""
+            if (cls.mode == 'HARD'):
+                suspendNotice = "; poop valve operation suspended"
+            pager.Pager.send("WARNING: manual override ({}) has been enabled for {}{}"
+                       .format(cls.mode, datetime.timedelta(seconds=int(now - cls.modeStartTime)), suspendNotice))
             cls.notifyNext = now + cls.interval['notifyN']
 

@@ -174,6 +174,7 @@ class Poop:
         else:
             valve_state = 'midway'
         cls.poop_notify(value, voltage, percent, valve_state)
+        override.Override.check()
         valve.Valve.maybeOperate(value)
 
     @classmethod
