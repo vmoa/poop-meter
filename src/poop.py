@@ -27,9 +27,15 @@ class Poop:
     }
 
     # A map of poop levels and what to do for each.
-    # Based on bench testing an inch equates to about 8 ticks on the ADC
-    # https://docs.google.com/document/d/1y9-7Vs1QebsVzuF8hXrv6W9YnSJAdl80ODEjWZSmrM8/
-    # This should be tuned after some real-world testing
+    #
+    # Based on bench testing (April 30, 2023) an inch equates to about 10 ticks on the ADC
+    #   https://docs.google.com/document/d/1y9-7Vs1QebsVzuF8hXrv6W9YnSJAdl80ODEjWZSmrM8/
+    # This gives us the following wholly untested formulae:
+    #
+    #   ADC = 892 - 10 * (Distance - 11.5)
+    #   Distance = (892 - ADC) / 10 + 11.5
+    #
+
     hour = 3600
     poopmap = [
         {
@@ -40,22 +46,22 @@ class Poop:
         }, {
             'severity' : 'nominal',
             'color'    : 'green',
-            'threshold': 320,           # 60 inches below 'PANIC' (5 feet) -- to be tuned
+            'threshold': 407,           # 60 inches below sensor (tune to an empty tank)
             'frequency': 7 * 24 * hour,
         }, {
             'severity' : 'High',
             'color'    : 'orange',
-            'threshold': 700,           # Should match the Classroom Red Light turning on
-            'frequency': 24 * hour,     # Wholly arbitrary before real-world tuning
+            'threshold': 700,           # 30 inches below sensor (tune to the non-linear section of the tank)
+            'frequency': 24 * hour,
         }, {
             'severity' : 'URGENT',
             'color'    : 'red',
-            'threshold': 800,           # 20 inches below sensor
-            'frequency': 4 * hour,      # Or maybe this should be the Red Light?
+            'threshold': 800,           # 20 inches below sensor (tune to match Red Light)
+            'frequency': 4 * hour,
         }, {
             'severity' : 'PANIC',        # This will trigger shutting off the water main valve
             'color'    : 'red',
-            'threshold': 880,           # 10 inches below sensor
+            'threshold': 888,           # 12 inches below sensor
             'frequency': 1 * hour,
         }, {
             'severity' : 'placeholder9', # place holder to make the math easier
