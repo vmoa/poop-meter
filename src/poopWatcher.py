@@ -100,7 +100,7 @@ def initialize():
     # Initialize the Grove LCD
     lcd = grove.Grove()
     lcd.setRGB(0, 255, 255)  # cyan
-    lcd.latentMessage("RFO Poop Meter\nVersion {}".format(version), 2)
+    lcd.latentMessage("RFO Poop Meter\n  {}".format(version), 2)
 
     # Initialize devices
     gpio = device.Gpio(lcd = lcd)
