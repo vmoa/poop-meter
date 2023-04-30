@@ -81,7 +81,8 @@ class Poop:
             mapidx += 1
         poopmapArray.append(poopmap[mapidx])
 
-    poopmessage = "Poop level {}: {:1.0f}% ({:d}, {:3.2}v) Valve:{}"  # Poop level PANIC|URGENT|High|nominal: 93% (128, 4.12v) Valve:open|closed
+    # Poop level PANIC|URGENT|High|nominal: 93% (128, 4.12v) Valve:open|closed Override:none|soft|SOFT|HARD
+    poopmessage = "Poop level {}: {:1.0f}% ({:d}, {:3.2}v) Valve:{} Override:{}"
     last_poopalert = poopmap[0]
     last_pooptime = 0
 
@@ -105,17 +106,20 @@ class Poop:
     def poop_notify(cls, value, voltage, percent, valve, recip=None):
         """Format and send poop message, throttled according to `frequency` defined in poopmap."""
         now = int(time.time())
-
-        # Find approprate stanza
-        for p in range(len(cls.poopmap)):
-            if (value < cls.poopmap[p]["threshold"]):
-                alert = cls.poopmap[p-1]
-                break
-
         elapsed = now - cls.last_pooptime
 
+        # Is it time to alert?
         if ((p != cls.last_poopalert) or (elapsed > alert["frequency"])):
-            pager.Pager.send(cls.poopmessage.format(alert["severity"], percent, value, voltage, valve))
+
+            # Find approprate stanza
+            for p in range(len(cls.poopmap)):
+                if (value < cls.poopmap[p]["threshold"]):
+                    alert = cls.poopmap[p-1]
+                    break
+
+            # Poop level PANIC|URGENT|High|nominal: 93% (128, 4.12v) Valve:open|closed Override:none|soft|SOFT|HARD
+            pager.Pager.send("Poop level {}: {:1.0f}% ({:d}, {:3.2}v) Valve:{} Override:{}"
+                .format(cls.poopmessage.format(alert["severity"], percent, value, voltage, valve, override.Override.getMode())))
             cls.last_poopalert = p
             cls.last_pooptime = now
 
@@ -139,11 +143,11 @@ class Poop:
     def printStatus(cls):
         """Update display and return a string with the formatted status."""
         poopLevel, poopVolts, poopPercent = device.Gpio.adc.get_values()
-        overrideMode = override.Override.mode;
 
         poopEntry = cls.poopmapArray[int(poopLevel)]
         poopColor = poopEntry["color"]
 
+        overrideMode = override.Override.getMode()
         if (overrideMode == 'none'):
             pass
         elif (poopColor == 'red'):
@@ -156,7 +160,10 @@ class Poop:
         device.Gpio.lcd.printLine("Poop level {:d}%".format(int(poopPercent)), line=0)              # Poop level 100%
         device.Gpio.lcd.printLine("  {:4.2f}v {:4d}".format(poopVolts, int(poopLevel)), line=1)     #   3.45v 1024   *
 
+        # 2023-04-28 07:32:00 [INFO] POOP:8.6%-88-0.28v Mode:OVR(HARD) -- [OPENED] (closed) (override) (enable) (open_close) [HEART]
         status = "POOP:{pct:3.1f}%-{val}-{volt:3.2f}v ".format(pct=poopPercent, val=poopLevel, volt=poopVolts)
+        status += " Mode:{}({})".format('OVR' if (override.Override.isOverride()) else 'run', overrideMode)
+        status += " -- "
         for sensor in device.Gpio.Sensor.sensors:
             if (sensor.is_active()):
                 status += "[{}] ".format(sensor.name.upper())

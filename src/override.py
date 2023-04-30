@@ -80,6 +80,17 @@ class Override:
         cls.debug and logging.debug("Enabling override debugging")
 
     @classmethod
+    def isOverride(cls):
+        if (cls.mode == 'none'):
+            return(False)
+        else:
+            return(True)
+
+    @classmethod
+    def getMode(cls):
+        return(cls.mode)
+
+    @classmethod
     def logIt(cls, mode, elapsed):
         cls.debug and logging.debug("Override mode ==> {} after {} seconds".format(mode, int(elapsed)))
 
@@ -87,8 +98,6 @@ class Override:
             msg = "Manual override disabled after {}".format(datetime.timedelta(seconds=int(time.time() - cls.modeStartTime)))
             logging.warning(msg)
             pager.Pager.send(msg)
-            cls.notifyNext = None
-            cls.modeStartTime = None
         elif (mode == 'soft'):
             pass
         else:
@@ -106,7 +115,8 @@ class Override:
         if (device.Gpio.is_override.isOn()):
             if (cls.startTime == None):
                 cls.startTime = now
-                cls.modeStartTime = cls.startTime
+            if (cls.modeStartTime == None):
+                cls.modeStartTime = now
             elapsed = now - cls.startTime
 
             False and cls.debug and logging.debug("check(): mode:{} elapsed:{} startTime:{}".
@@ -137,7 +147,7 @@ class Override:
 
         else:  # device.Gpio.is_override.isOff()
             if (cls.startTime):
-                elapsed = now - cls.startTime
+                elapsed = now - cls.modeStartTime
                 False and cls.debug and logging.debug("check(): mode:{} elapsed:{} startTime:{}".
                     format(cls.mode, int(elapsed), int(cls.startTime)))
                 if (cls.mode == 'soft'):
@@ -146,12 +156,13 @@ class Override:
                 elif (cls.mode == 'HARD' or cls.mode == 'SOFT'):
                     cls.mode = 'none'
                     cls.logIt(cls.mode, elapsed)
+                    cls.notifyNext = None
                     cls.modeStartTime = None
                 cls.startTime = None
 
         # Send override notification if it's time
         if (cls.notifyNext and now >= cls.notifyNext):
             pager.Pager.send("WARNING: manual override ({}) has been enabled for {}; poop valve operation suspended"
-                       .format(cls.mode, datetime.timedelta(seconds=int(now - cls.startTime))))
+                       .format(cls.mode, datetime.timedelta(seconds=int(now - cls.modeStartTime))))
             cls.notifyNext = now + cls.interval['notifyN']
 
