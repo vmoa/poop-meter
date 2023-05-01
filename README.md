@@ -18,6 +18,6 @@ if the tank gets to a panic level.
 
 Coming Real Soon Now.
 
-![Poop meter internals](Doc/Poop-meter-internals.jpg)
-
 ![Poop meter schematic](Doc/Schematic.jpg)
+
+![Poop meter internals](Doc/Poop-meter-internals.jpg)
