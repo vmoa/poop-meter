@@ -1,0 +1,3 @@
+#!/bin/sh
+
+(date +%s; rrdtool last /var/rrd/poopypi/poop.rrd; echo - p) | dc
