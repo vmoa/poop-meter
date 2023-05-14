@@ -51,7 +51,7 @@ class Poop:
         }, {
             'severity' : 'nominal',
             'color'    : 'green',
-            'threshold': 407,           # 60 inches below sensor (tune to an empty tank)
+            'threshold': 222,           # 60 inches below sensor (tune to an empty tank)
             'frequency': 7 * 24 * hour,
         }, {
             'severity' : 'High',
