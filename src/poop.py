@@ -23,8 +23,13 @@ class Poop:
         'sample': 1,
         'heart': 2,
         'status': 60,
+        'rrd': 1,
         'syscheck': 600,
     }
+
+    # RRD file and a flag to enable writing
+    rrdFile = '/var/rrd/poopypi/poop.rrd'
+    writeToRrd = False
 
     # A map of poop levels and what to do for each.
     #
@@ -98,6 +103,15 @@ class Poop:
 
     def __init__(self):
         pass
+
+    @classmethod
+    def checkForRrd(cls):
+        """Check if we have an RRD file to update."""
+        if (os.path.exists(cls.rrdFile)):
+            logging.info("RRD found: {}".format(cls.rrdFile))
+            cls.writeToRrd = True
+        else:
+            logging.info("RRD not found: {}".format(cls.rrdFile))
 
     @classmethod
     def simulateMode(cls, simulate):
@@ -208,6 +222,19 @@ class Poop:
         return(status)
 
     @classmethod
+    def updateRrd(cls):
+        """Send an update to the rrd database if it exists."""
+        if (cls.writeToRrd):
+            poopLevel = device.Gpio.adc.get_value()
+            if (device.Gpio.is_closed.isOn()):
+                valveClosed = 1
+            else:
+                valveClosed = 0
+            cmd = "rrdtool update {} N:{}:{}".format(cls.rrdFile, poopLevel, valveClosed)
+            logging.debug(cmd)
+            os.system(cmd)
+
+    @classmethod
     def syscheck(cls):
         """Check system stuff infrequently."""
         if (os.path.exists("nopage")):
@@ -226,6 +253,8 @@ class Poop:
                 device.Gpio.beatHeart(device.Gpio.heart.device)
             if (now % cls.interval['status'] == 0):
                 logging.info(Poop.printStatus())
+            if (now % cls.interval['rrd'] == 0):
+                cls.updateRrd()
             if (now % cls.interval['syscheck'] == 0):
                 cls.syscheck()
 

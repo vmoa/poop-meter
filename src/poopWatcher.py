@@ -104,6 +104,7 @@ def initialize():
 
     # Initialize devices
     gpio = device.Gpio(lcd = lcd)
+    poop.Poop.checkForRrd()
     poop.Poop.simulateMode(args.simulate)
     override.Override.simulateMode(args.simulate)
     logging.info(poop.Poop.printStatus())
