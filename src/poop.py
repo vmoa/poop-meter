@@ -23,7 +23,7 @@ class Poop:
         'sample': 1,
         'heart': 2,
         'status': 60,
-        'rrd': 1,
+        'rrd': 60,
         'syscheck': 600,
     }
 
