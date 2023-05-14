@@ -73,7 +73,14 @@ class Adc:
            This should be called at a regular interval by device.per_second()."""
         self.value = int(self.average(self.val_array, self.abs_value()))
         self.voltage = self.average(self.voltage_array, self.abs_voltage())
-        self.percent = (self.value - self.empty) / (self.full - self.empty) * 100
+        # Percent is a step function to "simulate" a cylindrical top
+        # Ppercent = ( Value - BottomOfRange ) / ( TopOfRange - BottomOfRange) * SizeOfRange_percent + bottomOfRange_percent
+        if (self.value > 800):
+            self.percent = (self.value - 800) / (888 - 800) * 10 + 90
+        elif (self.value > 700):
+            self.percent = (self.value - 700) / (800 - 700) * 10 + 80
+        else:
+            self.percent = (self.value - self.empty) / (700 - self.empty) * 80
 
     def get_value(self):
         """Return the average value over the last <num_samples>."""
