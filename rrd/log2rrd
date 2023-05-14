@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+# Scrape log file poop updates and insert them into the rrd
+# 2023-05-06 20:11:00 [INFO] POOP:73.2%-750-2.38v  Mode:run(none) -- [OPENED] (closed) (override) (enable) (open_close) [HEART]
+#
+# Usage examples:
+#   log2rrd /var/log/poop.log
+#   tail -500 /var/log/poop.log | log2rrd
+
+while (<>) {
+    if (/POOP:([0-9.]+)%-(\d+)-([0-9.]+)v/) {
+        my $level = $2;
+        my $time = substr($_, 0, 16);
+        $time =~ s/-//g;
+        my $closed = ((split)[7] eq '[CLOSED]');
+        my $cmd = sprintf "rrdtool update /var/rrd/poopypi/poop.rrd '%s\@%d:%d'\n", $time, $level, $closed;
+        print "$cmd\n";
+        #system($cmd);
+    }
+}

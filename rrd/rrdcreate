@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Create the rrd database
+#
+# It has two gauge data sources (DS): 
+#     level (treated as an integer)
+#     closed (treated as binary: 0,1)
+# Values are collected once per minute with a 10 minute heartbeat
+# 
+# Each has four archives:
+#    10 days of 1m
+#    90 days of 5m
+#    18 months of 1h
+#    10 years of 1d
+
+rrdfile=/var/rrd/poopypi/poop.rrd
+
+if [ -e $rrdfile ]; then
+    echo -n "RRD file $rrdfile exists; overwrite and DESTROY ALL DATA? "
+    read answer
+    case "$answer" in
+        y|Y*) ;;
+        *) echo "Nothing done"; exit
+    esac
+fi
+
+set +x
+rrdtool create /var/rrd/poopypi/poop.rrd \
+   --start now-10d --step 1m \
+   DS:level:GAUGE:10m:0:24000 \
+   RRA:AVERAGE:0.5:1m:10d \
+   RRA:AVERAGE:0.5:5m:90d \
+   RRA:AVERAGE:0.5:1h:18M \
+   RRA:AVERAGE:0.5:1d:10y \
+   DS:closed:GAUGE:10m:0:24000 \
+   RRA:LAST:0.5:1m:10d \
+   RRA:LAST:0.5:5m:90d \
+   RRA:LAST:0.5:1h:18M \
+   RRA:LAST:0.5:1d:10y \
+

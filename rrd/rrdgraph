@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Generate a pretty picture from the rrd data
+
+# TODO: add valve perhaps as an area printed before plotting where valve==1 plots 0 and valve==0 plots upper-limit
+
+rrdfile=/var/rrd/poopypi/poop.rrd
+
+rrdtool graph poop.png \
+    --start -7d \
+    --end now \
+    --title 'Poop Level' \
+    --width 1024 \
+    --height 384 \
+    --upper-limit 900 \
+    DEF:level=$rrdfile:level:AVERAGE \
+    DEF:closed=$rrdfile:closed:LAST \
+    AREA:level#00FF00 \
+    HRULE:888#FF0000:Panic \
+    HRULE:800#FFCC00:Urgent \
+    HRULE:700#FF8800:High \
+
