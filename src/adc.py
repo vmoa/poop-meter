@@ -27,8 +27,10 @@ class Adc:
     voltage = -1.0
     percent = -1.0
 
-    # Value returned when the tank is ready to burst
-    full_value = 1024
+    # Values returned when the tank is empty and ready to burst
+    # These should probably be scraped out of poop.py
+    empty = 222
+    full  = 888
 
     def __init__(self):
         """Initialize the spi bus and chip select and create the mcp object."""
@@ -71,7 +73,7 @@ class Adc:
            This should be called at a regular interval by device.per_second()."""
         self.value = int(self.average(self.val_array, self.abs_value()))
         self.voltage = self.average(self.voltage_array, self.abs_voltage())
-        self.percent = self.value / self.full_value * 100
+        self.percent = (self.value - self.empty) / (self.full - self.empty) * 100
 
     def get_value(self):
         """Return the average value over the last <num_samples>."""
