@@ -1,13 +1,30 @@
 #!/bin/bash
 
 # Generate a pretty picture from the rrd data
+#
+# Usage: rrdgraph [-N{hdwmy}] output_file
+
+outfile='poop.png'
+start='-7d'
+
+case "$1" in
+    -[0-9]*) start="$1"; shift
+esac
+
+if [ -n "$1" ]; then
+    outfile=$1
+else
+    outfile=poop.png
+fi
+
 
 # TODO: add valve perhaps as an area printed before plotting where valve==1 plots 0 and valve==0 plots upper-limit
 
 rrdfile=/var/rrd/poopypi/poop.rrd
 
-rrdtool graph poop.png \
-    --start -7d \
+rrdtool graph $outfile \
+    --imgformat PNG \
+    --start $start \
     --end now \
     --title 'Poop Level' \
     --width 1024 \
@@ -17,6 +34,6 @@ rrdtool graph poop.png \
     DEF:closed=$rrdfile:closed:LAST \
     AREA:level#00FF00 \
     HRULE:888#FF0000:Panic \
-    HRULE:800#FFCC00:Urgent \
-    HRULE:700#FF8800:High \
+    HRULE:800#FF8800:Urgent \
+    HRULE:700#FFCC00:High \
 
