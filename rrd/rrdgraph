@@ -6,9 +6,9 @@
 #    eg: rrdgraph -e 1685116800 -s 1685113200 -r /tmp/poop.rrd
 #
 # Crontab entries:
-#   */5 * * * * poop-meter/rrd/rrdgraph -e -7d -o - | ssh nas@shell.rfo.org cat \> htdocs/poop7d.png
-#   1 0 * * * poop-meter/rrd/rrdgraph -e -30d -o - | ssh nas@shell.rfo.org cat \> htdocs/poop30d.png
-#   2 0 * * * poop-meter/rrd/rrdgraph -e -1y -o - | ssh nas@shell.rfo.org cat \> htdocs/poop1y.png
+#   */5 * * * * poop-meter/rrd/rrdgraph -s -7d -o - | ssh nas@shell.rfo.org cat \> htdocs/poop7d.png
+#   1 0 * * * poop-meter/rrd/rrdgraph -s -30d -o - | ssh nas@shell.rfo.org cat \> htdocs/poop30d.png
+#   2 0 * * * poop-meter/rrd/rrdgraph -s -1y -o - | ssh nas@shell.rfo.org cat \> htdocs/poop1y.png
 
 # Defaults
 rrdfile=/var/rrd/poopypi/poop.rrd
