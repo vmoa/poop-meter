@@ -15,26 +15,28 @@
 
 rrdfile=/var/rrd/poopypi/poop.rrd
 
-if [ -e $rrdfile ]; then
-    echo -n "RRD file $rrdfile exists; overwrite and DESTROY ALL DATA? "
-    read answer
-    case "$answer" in
-        y|Y*) ;;
-        *) echo "Nothing done"; exit
-    esac
+if [ -n "$1" ]; then
+    rrdfile="$1"
 fi
 
-set +x
-rrdtool create /var/rrd/poopypi/poop.rrd \
-   --start now-10d --step 1m \
-   DS:level:GAUGE:10m:0:24000 \
+if [ -e $rrdfile ]; then
+    echo "ABORT! Cowardly refusing to overwrite existing $rrdfile!"
+    echo "       Manually remove it if you wish to proceed."
+    exit 1
+fi
+
+set -x
+rrdtool create $rrdfile \
+   --no-overwrite \
+   --start now-30d --step 1m \
+   DS:level:GAUGE:10m:0:1024 \
    RRA:AVERAGE:0.5:1m:10d \
    RRA:AVERAGE:0.5:5m:90d \
    RRA:AVERAGE:0.5:1h:18M \
    RRA:AVERAGE:0.5:1d:10y \
-   DS:closed:GAUGE:10m:0:24000 \
-   RRA:LAST:0.5:1m:10d \
-   RRA:LAST:0.5:5m:90d \
-   RRA:LAST:0.5:1h:18M \
-   RRA:LAST:0.5:1d:10y \
+   DS:closed:GAUGE:10m:0:1 \
+   RRA:MAX:0.5:1m:10d \
+   RRA:MAX:0.5:5m:90d \
+   RRA:MAX:0.5:1h:18M \
+   RRA:MAX:0.5:1d:10y \
 
