@@ -62,6 +62,8 @@ class Gpio:
         # Default callbacks; override at instance creation or by setting <var>.device.when_[de]activated
         def activated(self):
             logging.info(poop.Poop.printStatus() + ' HIGH:' + self.name)
+            if (self.name == 'closed' or self.name == 'opened'):
+                poop.Poop.updateRrd()
             if (self.name == 'override'):
                 override.Override.check()
 
