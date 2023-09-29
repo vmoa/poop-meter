@@ -1,8 +1,13 @@
 v1.0.6rc0
 
 # Leave the first line exactly the version number; it will be read by poopWatcher
+# When releasing a version, commit message should read 'bumped version to {version}'
 
-v1.0.5
+v1.0.6rc0: Fri Sep 29 07:17:31 2023 -0700
+
+    add open/close sentinel support
+
+v1.0.5: Sun May 28 12:42:21 2023 -0700
 
     added RRD support and utilities
     calcuate percent based on `empty` and `full` and step function to simulalte a cylindrical top of tank
