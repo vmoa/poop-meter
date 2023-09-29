@@ -1,7 +1,11 @@
-v1.0.6rc0
+v1.0.6rc1
 
 # Leave the first line exactly the version number; it will be read by poopWatcher
 # When releasing a version, commit message should read 'bumped version to {version}'
+
+v1.0.6rc1: Fri 29 Sep 07:57:44 2023 -0700
+
+    made check_sentinel_files a classmethod; fixed some boffos
 
 v1.0.6rc0: Fri Sep 29 07:17:31 2023 -0700
 
