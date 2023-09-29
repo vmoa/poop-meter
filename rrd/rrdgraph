@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# Generate a pretty graph from the rrd data
+#
+# Usage: rrdgraph [-s <start>] [-e <end>] [-r <rrdfile>] [[-o] output_file]
+#    eg: rrdgraph -e 1685116800 -s 1685113200 -r /tmp/poop.rrd
+#
+# Crontab entries:
+#   */5 * * * * poop-meter/rrd/rrdgraph -s -7d -o - | ssh nas@shell.rfo.org cat \> htdocs/poop7d.png
+#   1 0 * * * poop-meter/rrd/rrdgraph -s -30d -o - | ssh nas@shell.rfo.org cat \> htdocs/poop30d.png
+#   2 0 * * * poop-meter/rrd/rrdgraph -s -1y -o - | ssh nas@shell.rfo.org cat \> htdocs/poop1y.png
+
+# Defaults
+rrdfile=/var/rrd/poopypi/poop.rrd
+outfile='poop.png'
+start='-7d'
+end='now'
+
+while [ -n "$1" ]; do
+    case "$1" in
+        -s) start="$2"; shift; shift;;
+        -e) end="$2"; shift; shift;;
+        -r) rrdfile="$2"; shift; shift;;
+        -o) outfile="$2"; shift; shift;;
+        -*) echo $usage; exit;;
+        *) outfile="$1"; shift;;
+    esac
+done
+
+indent="                                             "
+
+rrdtool graph $outfile \
+    --imgformat PNG \
+    --start $start \
+    --end $end \
+    --title 'Poop Level' \
+    --width 1024 \
+    --height 384 \
+    --lower-limit 201 \
+    --upper-limit 900 \
+    DEF:level=$rrdfile:level:AVERAGE \
+    VDEF:level_max=level,MAXIMUM \
+    VDEF:level_min=level,MINIMUM \
+    DEF:closed=$rrdfile:closed:LAST \
+    CDEF:valve=closed,0,GT,899,UNKN,IF \
+    TEXTALIGN:left \
+    COMMENT:"$indent" \
+    COMMENT:"Statistics\:                          Legend\:\l" \
+    COMMENT:"$indent" \
+    GPRINT:level_max:"High water\: %4.0lf           " \
+    AREA:valve#A86032:"Valve Closed" \
+    AREA:level#00FF00:"Poop Level\l" \
+    LINE2:level#1C7A58 \
+    COMMENT:"$indent" \
+    GPRINT:level_min:"Low water\:  %4.0lf           " \
+    LINE2:888#FF0000:"Panic " \
+    LINE2:800#FF8800:"Urgent " \
+    LINE2:700#FFCC00:High \
+
+
+legend_design=<<EOF
+  Statistics:                          Legend:
+  High water: 1234         [] Valve Closed  [] Poop Level
+  Low water:  1234         [] Panic   [] Urgent   [] High
+EOF

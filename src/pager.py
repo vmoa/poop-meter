@@ -21,8 +21,7 @@ class Pager:
 
     def __init__(self, simulate=False):
         self.simulate_mode(simulate)
-        self.config.read('twilio.conf')
-        self.config.read('/usr/local/etc/twilio.conf')
+        self.config.read([ './twilio.conf', './etc/twilio.conf', '/usr/local/etc/twilio.conf' ])
         if ('twilio' not in self.config):
             logging.error("Pager: no Twilio config found; pages will not be sent")
             return

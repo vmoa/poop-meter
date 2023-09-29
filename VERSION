@@ -1,6 +1,13 @@
-v1.0.5rc0
+v1.0.6rc0
 
 # Leave the first line exactly the version number; it will be read by poopWatcher
+
+v1.0.5
+
+    added RRD support and utilities
+    calcuate percent based on `empty` and `full` and step function to simulalte a cylindrical top of tank
+    update `nominal` value from last pump out
+    cleaned up documentation and added some jpgs
 
 v1.0.4: Sun 30 Apr 16:25:15 PDT 2023
 

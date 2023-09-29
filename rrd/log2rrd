@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+#
+# Scrape log file poop updates and insert them into the rrd
+# 2023-05-06 20:11:00 [INFO] POOP:73.2%-750-2.38v  Mode:run(none) -- [OPENED] (closed) (override) (enable) (open_close) [HEART]
+
+# Usage: log2rrd [-d] [output.rrd] [input.log...]
+#
+# Usage examples:
+#   log2rrd /var/log/poop.log
+#   log2rrd /tmp/poop.rrd /var/log/poop.log
+#   tail -500 /var/log/poop.log | log2rrd
+
+# sudo apt-get install libdatetime-format-dateparse-perl
+use Date::Parse;
+
+my $dryrun = 0;
+my $fn = '/var/rrd/poopypi/poop.rrd';
+
+while ($#ARGV >= 0) {
+    if ($ARGV[0] =~ /^-/) {
+        if ($ARGV[0] eq '-d') {
+            $dryrun = shift;
+        } else {
+            die "$0: $ARGV[0]: unknown option\n";
+        }
+    } elsif ($ARGV[0] =~ /rrd$/) {
+        $fn = shift;
+    }
+}
+
+my @data;
+my $cmd_count = 0;
+my $total = 0;
+
+sub run_em(@data) {
+    my $cmd = join(' ', "rrdtool update $fn --skip-past-updates", @data);
+    print "$cmd\n";
+    system($cmd) unless ($dryrun);
+    $total += $#data + 1;
+    $cmd_count++;
+}
+
+while (<>) {
+    if (/POOP:([0-9.]+)%-(\d+)-([0-9.]+)v/) {
+        my $level = $2;
+        my $ts = str2time(substr($_, 0, 19));
+        my $closed = ((split)[7] eq '[CLOSED]');
+        push(@data, sprintf "%s:%d:%d", $ts, $level, $closed);
+        if ($#data >= 63) {
+            run_em(@data);
+            @data = ();
+        }
+    }
+}
+
+if (@data) {
+    run_em(@data)
+}
+
+print "Attempted $total data points in $cmd_count commands\n";
