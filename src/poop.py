@@ -23,7 +23,7 @@ class Poop:
         'sample': 1,
         'heart': 2,
         'status': 60,
-        'syscheck': 600,
+        'sysnotify': 600,
     }
 
     # A map of poop levels and what to do for each.
@@ -168,6 +168,16 @@ class Poop:
             device.Gpio.lcd.printLine("   OVERRIDE    ", line=1)
             cls.textIterator = not cls.textIterator
 
+    def check_sentinel_files(self):
+        for file in [ 'open', 'close' ]:
+            if (os.path.exists(file)):
+                if (override.Override.getMode() == 'HARD'):
+                    logging.warning("Sentinel file '{}' found but manual override in effect; cannot open valve".format(file))
+                else:
+                    logging.warning("Sentinel file '{}' found -- {}ing valve".format(file, substr(file,0,4)))
+                    valve.Valve.operate(file)
+                sys.path.unlink(file)
+
     @classmethod
     def check(cls):
         """Read the poop level from the ADC and Do The Right Thing(tm)."""
@@ -208,8 +218,8 @@ class Poop:
         return(status)
 
     @classmethod
-    def syscheck(cls):
-        """Check system stuff infrequently."""
+    def sysnotify(cls):
+        """Notify system stuff infrequently."""
         if (os.path.exists("nopage")):
             logging.warning("Sentinel file 'nopage' file found -- pages are NOT being sent!")
 
@@ -226,8 +236,9 @@ class Poop:
                 device.Gpio.beatHeart(device.Gpio.heart.device)
             if (now % cls.interval['status'] == 0):
                 logging.info(Poop.printStatus())
-            if (now % cls.interval['syscheck'] == 0):
-                cls.syscheck()
+            if (now % cls.interval['sysnotify'] == 0):
+                cls.sysnotify()
 
+            cls.check_sentinel_files()
             cls.check()
 
