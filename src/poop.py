@@ -182,15 +182,16 @@ class Poop:
             device.Gpio.lcd.printLine("   OVERRIDE    ", line=1)
             cls.textIterator = not cls.textIterator
 
+    @classmethod
     def check_sentinel_files(self):
         for file in [ 'open', 'close' ]:
             if (os.path.exists(file)):
                 if (override.Override.getMode() == 'HARD'):
                     logging.warning("Sentinel file '{}' found but manual override in effect; cannot open valve".format(file))
                 else:
-                    logging.warning("Sentinel file '{}' found -- {}ing valve".format(file, substr(file,0,4)))
+                    logging.warning("Sentinel file '{}' found -- {}ing valve".format(file, file[0:4]))
                     valve.Valve.operate(file)
-                sys.path.unlink(file)
+                os.remove(file)
 
     @classmethod
     def check(cls):
